@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Porky Yorkie Measurement Builder</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">Porky Yorkie Measurement Builder</div>
+    <div class="subbrand">Production template filler</div>
+  </header>
+
+  <main>
+    <section class="card">
+      <label for="templateSelect">Garment Template</label>
+      <select id="templateSelect"></select>
+      <div id="templateStatus" class="status"></div>
+    </section>
+
+    <section class="layout">
+      <aside class="card form-card">
+        <div id="fields"></div>
+        <button id="exportBtn" class="green">Export Finished PNG</button>
+        <button id="clearBtn" class="secondary">Clear Fields</button>
+
+        <details>
+          <summary>Position Adjust Mode</summary>
+          <p class="small">Use once per template if the default text positions need adjustment. Drag labels on the preview, then save.</p>
+          <button id="calibrateBtn" class="secondary">Turn On Position Adjust Mode</button>
+          <button id="savePositionsBtn" class="green hidden">Save Text Positions</button>
+          <button id="resetPositionsBtn" class="red">Reset Positions for This Template</button>
+        </details>
+      </aside>
+
+      <section class="card preview-card">
+        <div id="previewWrap" class="preview-wrap">
+          <img id="templateImg" alt="Selected master template" />
+          <div id="overlayLayer"></div>
+        </div>
+      </section>
+    </section>
+
+    <section class="card help">
+      <strong>Setup:</strong> Upload master PNGs to the GitHub <code>templates/</code> folder using the exact filenames listed in <code>templates.json</code>.
+      Then this app loads them automatically on iPad, iPhone, and MacBook.
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

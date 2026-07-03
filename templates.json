@@ -1,0 +1,403 @@
+[
+  {
+    "id": "short-sleeve-tshirt",
+    "label": "Short Sleeve T-Shirt",
+    "file": "short-sleeve-tshirt.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Length"
+    ]
+  },
+  {
+    "id": "long-sleeve-tshirt",
+    "label": "Long Sleeve T-Shirt",
+    "file": "long-sleeve-tshirt.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Length",
+      "Sleeve Length"
+    ]
+  },
+  {
+    "id": "crewneck-sweatshirt",
+    "label": "Crew Neck Sweatshirt",
+    "file": "crewneck-sweatshirt.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Length",
+      "Sleeve Length"
+    ]
+  },
+  {
+    "id": "crewneck-sweater",
+    "label": "Crew Neck Sweater",
+    "file": "crewneck-sweater.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Length",
+      "Sleeve Length"
+    ]
+  },
+  {
+    "id": "hoodie",
+    "label": "Hoodie",
+    "file": "hoodie.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Length",
+      "Sleeve Length"
+    ]
+  },
+  {
+    "id": "short-sleeve-polo",
+    "label": "Short Sleeve Polo",
+    "file": "short-sleeve-polo.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Length"
+    ]
+  },
+  {
+    "id": "long-sleeve-polo",
+    "label": "Long Sleeve Polo",
+    "file": "long-sleeve-polo.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Length",
+      "Sleeve Length"
+    ]
+  },
+  {
+    "id": "tank-top",
+    "label": "Tank Top",
+    "file": "tank-top.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Length"
+    ]
+  },
+  {
+    "id": "sleeveless-shirt",
+    "label": "Sleeveless Shirt",
+    "file": "sleeveless-shirt.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Length"
+    ]
+  },
+  {
+    "id": "basketball-jersey",
+    "label": "Basketball Jersey",
+    "file": "basketball-jersey.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Length"
+    ]
+  },
+  {
+    "id": "baseball-jersey",
+    "label": "Baseball Jersey",
+    "file": "baseball-jersey.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Length"
+    ]
+  },
+  {
+    "id": "football-jersey",
+    "label": "Football Jersey",
+    "file": "football-jersey.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Length",
+      "Sleeve Length"
+    ]
+  },
+  {
+    "id": "short-sleeve-button-up",
+    "label": "Short Sleeve Button-Up",
+    "file": "short-sleeve-button-up.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Length",
+      "Sleeve Length"
+    ]
+  },
+  {
+    "id": "jeans",
+    "label": "Jeans",
+    "file": "jeans.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Waist",
+      "Rise",
+      "Thigh",
+      "Inseam",
+      "Outseam",
+      "Leg Opening"
+    ]
+  },
+  {
+    "id": "shorts",
+    "label": "Shorts",
+    "file": "shorts.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Waist",
+      "Rise",
+      "Inseam",
+      "Length",
+      "Leg Opening"
+    ]
+  },
+  {
+    "id": "bib-overalls",
+    "label": "Bib Overalls",
+    "file": "bib-overalls.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Overall Length",
+      "Waist",
+      "Rise",
+      "Thigh",
+      "Inseam",
+      "Leg Opening"
+    ]
+  },
+  {
+    "id": "blazer-sportcoat",
+    "label": "Blazer / Sport Coat",
+    "file": "blazer-sportcoat.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Waist",
+      "Shoulder",
+      "Sleeve Length",
+      "Length"
+    ]
+  },
+  {
+    "id": "two-piece-suit",
+    "label": "Two-Piece Suit",
+    "file": "two-piece-suit.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Jacket Pit to Pit",
+      "Jacket Waist",
+      "Shoulder",
+      "Sleeve Length",
+      "Jacket Length",
+      "Pant Waist",
+      "Rise",
+      "Inseam",
+      "Outseam",
+      "Leg Opening"
+    ]
+  },
+  {
+    "id": "three-piece-suit",
+    "label": "Three-Piece Suit",
+    "file": "three-piece-suit.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Jacket Pit to Pit",
+      "Jacket Waist",
+      "Shoulder",
+      "Sleeve Length",
+      "Jacket Length",
+      "Vest Pit to Pit",
+      "Vest Length",
+      "Pant Waist",
+      "Rise",
+      "Inseam",
+      "Outseam",
+      "Leg Opening"
+    ]
+  },
+  {
+    "id": "denim-jacket",
+    "label": "Denim Jacket",
+    "file": "denim-jacket.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Shoulder",
+      "Sleeve Length",
+      "Length"
+    ]
+  },
+  {
+    "id": "workwear-vest",
+    "label": "Workwear Vest",
+    "file": "workwear-vest.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Shoulder",
+      "Length"
+    ]
+  },
+  {
+    "id": "sweater-vest",
+    "label": "Sweater Vest",
+    "file": "sweater-vest.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Shoulder",
+      "Length"
+    ]
+  },
+  {
+    "id": "workwear-jacket",
+    "label": "Workwear Jacket",
+    "file": "workwear-jacket.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Shoulder",
+      "Sleeve Length",
+      "Length"
+    ]
+  },
+  {
+    "id": "hockey-jersey",
+    "label": "Hockey Jersey",
+    "file": "hockey-jersey.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Length",
+      "Sleeve Length"
+    ]
+  },
+  {
+    "id": "long-sleeve-button-up",
+    "label": "Long Sleeve Button-Up",
+    "file": "long-sleeve-button-up.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Shoulder",
+      "Sleeve Length",
+      "Length"
+    ]
+  },
+  {
+    "id": "chore-coat",
+    "label": "Chore Coat",
+    "file": "chore-coat.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Shoulder",
+      "Sleeve Length",
+      "Length"
+    ]
+  },
+  {
+    "id": "bomber-jacket",
+    "label": "Bomber Jacket",
+    "file": "bomber-jacket.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Shoulder",
+      "Sleeve Length",
+      "Length"
+    ]
+  },
+  {
+    "id": "windbreaker",
+    "label": "Windbreaker",
+    "file": "windbreaker.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Shoulder",
+      "Sleeve Length",
+      "Length"
+    ]
+  },
+  {
+    "id": "rain-jacket",
+    "label": "Rain Jacket",
+    "file": "rain-jacket.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Shoulder",
+      "Sleeve Length",
+      "Length"
+    ]
+  },
+  {
+    "id": "overcoat-topcoat",
+    "label": "Overcoat / Topcoat",
+    "file": "overcoat-topcoat.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Shoulder",
+      "Sleeve Length",
+      "Length"
+    ]
+  },
+  {
+    "id": "peacoat",
+    "label": "Peacoat",
+    "file": "peacoat.png",
+    "fields": [
+      "Item Name",
+      "Tagged Size",
+      "Pit to Pit",
+      "Shoulder",
+      "Sleeve Length",
+      "Length"
+    ]
+  }
+]
