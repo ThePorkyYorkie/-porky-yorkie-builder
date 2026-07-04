@@ -1,2 +1,1 @@
-Porky Yorkie Measurement Builder production package.
-Upload index.html, .nojekyll, and the templates folder to the GitHub repository root.
+Porky Yorkie Measurement Builder V2 flat GitHub Pages repository. Upload all files to repository root.
