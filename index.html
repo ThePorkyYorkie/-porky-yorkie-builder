@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Porky Yorkie Measurement Builder V2</title>
+<title>Porky Yorkie Measurement Builder V2.1</title>
 <style>
 body{margin:0;background:#f7f1e7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#111}
 header{background:#061b3a;color:white;padding:14px 16px;position:sticky;top:0;z-index:10}
@@ -17,7 +17,7 @@ button{border:0;background:#061b3a;color:white;font-weight:900;margin-top:10px}.
 .calibrating .overlay{outline:2px dashed #1473ff;background:rgba(255,255,255,.58);pointer-events:auto;cursor:move}
 details{margin-top:14px;border-top:1px solid #eee;padding-top:12px}summary{font-weight:900;cursor:pointer}.statusline{margin-top:8px}.note{font-size:12px;color:#555}.row{display:flex;gap:8px}.row button{flex:1}.selectedField{margin-top:10px;padding:10px;border:1px solid #ddd;border-radius:10px;background:#fafafa}.sizeReadout{font-size:13px;font-weight:900;color:#061b3a;margin-top:6px}.overlay.selected{outline:3px solid #ffb000!important;background:rgba(255,255,255,.72)}
 </style></head>
-<body><header><div class="brand">Porky Yorkie Measurement Builder V2</div><div class="sub">Flat repo production version</div></header>
+<body><header><div class="brand">Porky Yorkie Measurement Builder V2.1</div><div class="sub">Flat repo production version</div></header>
 <main><section class="card"><label>Garment Template</label><select id="templateSelect"></select><div id="status" class="statusline"></div></section>
 <section class="layout"><aside class="card"><div id="fields"></div>
 <div id="fontControls" class="selectedField">
@@ -48,10 +48,10 @@ function loadTemplate(i){current=TEMPLATES[i];values={};selectedField=null;posit
 function renderFields(){let box=$("fields");box.innerHTML="";current.fields.forEach(f=>{let l=document.createElement("label");l.textContent=f;let inp=document.createElement("input");inp.placeholder=f;inp.value=values[f]||"";inp.oninput=()=>{values[f]=inp.value;renderOverlay()};box.appendChild(l);box.appendChild(inp)})}
 function isMeasure(f){return f!=="Item Name"&&f!=="Tagged Size"}function fmt(f,v){v=String(v||"").trim();if(!v)return"";return v}
 function updateSelectedUI(){let name=$("selectedFieldName"),size=$("fontSizeReadout");if(!name||!size)return;if(selectedField&&positions[selectedField]){name.textContent=selectedField;size.textContent=positions[selectedField].size||28}else{name.textContent="None";size.textContent="—"}}
-function selectField(f){selectedField=f;updateSelectedUI();renderOverlay()}
+function selectFieldOnly(f){selectedField=f;updateSelectedUI();document.querySelectorAll(".overlay").forEach(el=>el.classList.remove("selected"));let picked=document.querySelector('[data-field="'+CSS.escape(f)+'"]');if(picked)picked.classList.add("selected")}
 function changeFontSize(delta){if(!selectedField){alert("Tap or drag a text field first while Position Adjust Mode is on.");return}positions[selectedField]=positions[selectedField]||defaultPos(selectedField);positions[selectedField].size=Math.max(8,Math.min(90,(positions[selectedField].size||28)+delta));updateSelectedUI();renderOverlay()}
-function renderOverlay(){let layer=$("overlay"),wrap=$("preview");layer.innerHTML="";wrap.classList.toggle("calibrating",calibrating);current.fields.forEach(f=>{let p=positions[f]||defaultPos(f),v=fmt(f,values[f]);if(!v&&!calibrating)return;let d=document.createElement("div");d.className="overlay"+(selectedField===f?" selected":"");d.textContent=v||f;d.style.left=p.x+"%";d.style.top=p.y+"%";d.style.fontSize=Math.max(11,wrap.clientWidth*((p.size||28)/1254))+"px";d.style.opacity=v?1:.62;d.onclick=(e)=>{if(calibrating){e.stopPropagation();selectField(f)}};if(calibrating)drag(d,f);layer.appendChild(d)});updateSelectedUI()}
-function drag(el,f){let down=false;function move(x,y){let r=$("preview").getBoundingClientRect();positions[f].x=Math.max(0,Math.min(100,(x-r.left)/r.width*100));positions[f].y=Math.max(0,Math.min(100,(y-r.top)/r.height*100));el.style.left=positions[f].x+"%";el.style.top=positions[f].y+"%"}el.onpointerdown=e=>{down=true;selectField(f);el.setPointerCapture(e.pointerId);move(e.clientX,e.clientY)};el.onpointermove=e=>{if(down)move(e.clientX,e.clientY)};el.onpointerup=()=>down=false}
+function renderOverlay(){let layer=$("overlay"),wrap=$("preview");layer.innerHTML="";wrap.classList.toggle("calibrating",calibrating);current.fields.forEach(f=>{let p=positions[f]||defaultPos(f),v=fmt(f,values[f]);if(!v&&!calibrating)return;let d=document.createElement("div");d.className="overlay"+(selectedField===f?" selected":"");d.dataset.field=f;d.textContent=v||f;d.style.left=p.x+"%";d.style.top=p.y+"%";d.style.fontSize=Math.max(11,wrap.clientWidth*((p.size||28)/1254))+"px";d.style.opacity=v?1:.62;if(calibrating)drag(d,f);layer.appendChild(d)});updateSelectedUI()}
+function drag(el,f){let down=false;function move(x,y){let r=$("preview").getBoundingClientRect();positions[f]=positions[f]||defaultPos(f);positions[f].x=Math.max(0,Math.min(100,(x-r.left)/r.width*100));positions[f].y=Math.max(0,Math.min(100,(y-r.top)/r.height*100));el.style.left=positions[f].x+"%";el.style.top=positions[f].y+"%"}el.onpointerdown=e=>{down=true;e.preventDefault();selectFieldOnly(f);try{el.setPointerCapture(e.pointerId)}catch(err){}move(e.clientX,e.clientY)};el.onpointermove=e=>{if(down){e.preventDefault();move(e.clientX,e.clientY)}};el.onpointerup=e=>{down=false;try{el.releasePointerCapture(e.pointerId)}catch(err){}};el.onclick=e=>{e.preventDefault();selectFieldOnly(f)}}
 $("calibrateBtn").onclick=()=>{calibrating=!calibrating;$("calibrateBtn").textContent=calibrating?"Turn Off Position Adjust Mode":"Turn On Position Adjust Mode";renderOverlay()};$("smallerBtn").onclick=()=>changeFontSize(-1);$("largerBtn").onclick=()=>changeFontSize(1);
 $("saveBtn").onclick=savePositions;$("resetBtn").onclick=()=>{if(confirm("Reset positions for this template?")){localStorage.removeItem("py_pos_v2_"+current.id);positions=loadPositions();renderOverlay()}};
 $("clearBtn").onclick=()=>loadTemplate(Number($("templateSelect").value));
