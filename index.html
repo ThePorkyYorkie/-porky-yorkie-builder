@@ -31,7 +31,7 @@ details{margin-top:14px;border-top:1px solid #eee;padding-top:12px}summary{font-
 <button class="green" id="exportBtn">Save to Photos</button><button class="secondary" id="clearBtn">Clear Fields</button>
 <details open><summary>Position Adjust Mode</summary><p class="small">Turn on, drag text to exact spots, then save. Saved positions stay on this device.</p>
 <button class="secondary" id="calibrateBtn">Turn On Position Adjust Mode</button>
-<div class="row"><button class="green" id="saveBtn">Save Text Positions</button><button class="red" id="resetBtn">Reset Positions</button></div>
+<div class="row"><button class="green" id="saveBtn">Save Text Positions + Sizes</button><button class="red" id="resetBtn">Reset Positions</button></div>
 </details><p class="note">Measurements automatically add the inch mark.</p></aside>
 <section class="card"><div id="preview" class="preview"><img id="templateImg"><div id="overlay"></div></div></section></section></main>
 <script>
@@ -42,7 +42,7 @@ let current=TEMPLATES[0],values={},positions={},calibrating=false,selectedField=
 const $=id=>document.getElementById(id);
 function defaultPos(f){return (OVERRIDES[current.id]&&OVERRIDES[current.id][f])?{...OVERRIDES[current.id][f]}:(DEFAULT_POSITIONS[f]?{...DEFAULT_POSITIONS[f]}:{x:50,y:50,size:28})}
 function loadPositions(){let p={};current.fields.forEach(f=>p[f]=defaultPos(f));try{let saved=JSON.parse(localStorage.getItem("py_pos_v2_"+current.id)||"{}");Object.assign(p,saved)}catch(e){}return p}
-function savePositions(){localStorage.setItem("py_pos_v2_"+current.id,JSON.stringify(positions));alert("Positions saved for "+current.label)}
+function savePositions(){current.fields.forEach(f=>{positions[f]=positions[f]||defaultPos(f);positions[f].x=Number(positions[f].x);positions[f].y=Number(positions[f].y);positions[f].size=Number(positions[f].size||defaultPos(f).size||28)});localStorage.setItem("py_pos_v2_"+current.id,JSON.stringify(positions));alert("Text positions and sizes saved for "+current.label)}
 function init(){TEMPLATES.forEach((t,i)=>{let o=document.createElement("option");o.value=i;o.textContent=t.label;$("templateSelect").appendChild(o)});$("templateSelect").onchange=()=>loadTemplate(Number($("templateSelect").value));loadTemplate(0)}
 function loadTemplate(i){current=TEMPLATES[i];values={};selectedField=null;positions=loadPositions();let img=$("templateImg");img.src=current.file+"?v=2";img.onload=()=>{$("status").innerHTML='<span class="loaded">✅ Loaded: '+current.label+'</span>';renderOverlay()};img.onerror=()=>{$("status").innerHTML='<span class="missing">❌ Missing image: '+current.file+'</span>'};renderFields();renderOverlay()}
 function renderFields(){let box=$("fields");box.innerHTML="";current.fields.forEach(f=>{let l=document.createElement("label");l.textContent=f;let inp=document.createElement("input");inp.placeholder=f;inp.value=values[f]||"";inp.oninput=()=>{values[f]=inp.value;renderOverlay()};box.appendChild(l);box.appendChild(inp)})}
