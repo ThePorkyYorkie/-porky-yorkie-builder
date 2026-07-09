@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Porky Yorkie Measurement Builder V2.1</title>
+<title>Porky Yorkie Measurement Builder V3.0</title>
 <style>
 body{margin:0;background:#f7f1e7;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#111}
 header{background:#061b3a;color:white;padding:14px 16px;position:sticky;top:0;z-index:10}
@@ -17,10 +17,14 @@ button{border:0;background:#061b3a;color:white;font-weight:900;margin-top:10px}.
 .calibrating .overlay{outline:2px dashed #1473ff;background:rgba(255,255,255,.58);pointer-events:auto;cursor:move}
 details{margin-top:14px;border-top:1px solid #eee;padding-top:12px}summary{font-weight:900;cursor:pointer}.statusline{margin-top:8px}.note{font-size:12px;color:#555}.row{display:flex;gap:8px}.row button{flex:1}.selectedField{margin-top:10px;padding:10px;border:1px solid #ddd;border-radius:10px;background:#fafafa}.sizeReadout{font-size:13px;font-weight:900;color:#061b3a;margin-top:6px}.overlay.selected{outline:3px solid #ffb000!important;background:rgba(255,255,255,.72)}
 </style></head>
-<body><header><div class="brand">Porky Yorkie Measurement Builder V2.1</div><div class="sub">Flat repo production version</div></header>
+<body><header><div class="brand">Porky Yorkie Measurement Builder V3.0</div><div class="sub">Production calibrated version</div></header>
 <main><section class="card"><label>Garment Template</label><select id="templateSelect"></select><div id="status" class="statusline"></div></section>
 <section class="layout"><aside class="card"><div id="fields"></div>
-<div id="fontControls" class="selectedField">
+<button class="green" id="exportBtn">Save to Photos</button><button class="secondary" id="clearBtn">Clear Fields</button>
+<details open><summary>Position Adjust Mode</summary><p class="small">Turn on, drag text to exact spots, then save. Saved positions stay on this device.</p>
+<button class="secondary" id="calibrateBtn">Turn On Position Adjust Mode</button>
+<div class="row"><button class="green" id="saveBtn">Save Text Positions + Sizes</button><button class="red" id="resetBtn">Reset Positions</button></div><button class="secondary" id="exportCalibrationBtn">Export Calibration File</button>
+<div id="fontControls" class="selectedField hidden">
   <div class="small">Selected Field: <strong id="selectedFieldName">None</strong></div>
   <div class="sizeReadout">Font Size: <span id="fontSizeReadout">—</span></div>
   <div class="row">
@@ -28,23 +32,739 @@ details{margin-top:14px;border-top:1px solid #eee;padding-top:12px}summary{font-
     <button class="secondary" id="largerBtn">A+ Larger</button>
   </div>
 </div>
-<button class="green" id="exportBtn">Save to Photos</button><button class="secondary" id="clearBtn">Clear Fields</button>
-<details open><summary>Position Adjust Mode</summary><p class="small">Turn on, drag text to exact spots, then save. Saved positions stay on this device.</p>
-<button class="secondary" id="calibrateBtn">Turn On Position Adjust Mode</button>
-<div class="row"><button class="green" id="saveBtn">Save Text Positions + Sizes</button><button class="red" id="resetBtn">Reset Positions</button></div><button class="secondary" id="exportCalibrationBtn">Export Calibration File</button>
-</details><p class="note">Measurements automatically add the inch mark.</p></aside>
+</details><p class="note">Enter measurements exactly as you want them to appear. Calibration tools are only needed when adjusting templates.</p></aside>
 <section class="card"><div id="preview" class="preview"><img id="templateImg"><div id="overlay"></div></div></section></section></main>
 <script>
-const TEMPLATES = [{"id": "short-sleeve-tshirt", "label": "Short Sleeve T-Shirt", "file": "short-sleeve-tshirt.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"]}, {"id": "long-sleeve-tshirt", "label": "Long Sleeve T-Shirt", "file": "long-sleeve-tshirt.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"]}, {"id": "tank-top", "label": "Tank Top", "file": "tank-top.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"]}, {"id": "sleeveless-shirt", "label": "Sleeveless Shirt", "file": "sleeveless-shirt.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"]}, {"id": "short-sleeve-polo", "label": "Polo Shirt", "file": "short-sleeve-polo.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"]}, {"id": "long-sleeve-polo", "label": "Long Sleeve Polo", "file": "long-sleeve-polo.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"]}, {"id": "short-sleeve-button-up", "label": "Short Sleeve Button-Up Shirt", "file": "short-sleeve-button-up.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"]}, {"id": "hoodie", "label": "Hoodie", "file": "hoodie.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"]}, {"id": "crewneck-sweatshirt", "label": "Crew Neck Sweatshirt", "file": "crewneck-sweatshirt.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"]}, {"id": "crewneck-sweater", "label": "Crew Neck Sweater", "file": "crewneck-sweater.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"]}, {"id": "jeans", "label": "Jeans", "file": "jeans.png", "fields": ["Item Name", "Tagged Size", "Waist", "Rise", "Thigh", "Inseam", "Outseam", "Leg Opening"]}, {"id": "shorts", "label": "Shorts", "file": "shorts.png", "fields": ["Item Name", "Tagged Size", "Waist", "Rise", "Inseam", "Length", "Leg Opening"]}, {"id": "bib-overalls", "label": "Bib Overalls", "file": "bib-overalls.png", "fields": ["Item Name", "Tagged Size", "Overall Length", "Waist", "Rise", "Thigh", "Inseam", "Leg Opening"]}, {"id": "workwear-jacket", "label": "Workwear Jacket", "file": "workwear-jacket.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Shoulder", "Sleeve Length", "Length"]}, {"id": "denim-jacket", "label": "Denim Jacket", "file": "denim-jacket.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Shoulder", "Sleeve Length", "Length"]}, {"id": "workwear-vest", "label": "Workwear Vest", "file": "workwear-vest.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Shoulder", "Length"]}, {"id": "blazer-sportcoat", "label": "Blazer / Sport Coat", "file": "blazer-sportcoat.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Waist", "Shoulder", "Sleeve Length", "Length"]}, {"id": "two-piece-suit", "label": "Two-Piece Suit", "file": "two-piece-suit.png", "fields": ["Item Name", "Tagged Size", "Jacket Pit to Pit", "Jacket Waist", "Shoulder", "Sleeve Length", "Jacket Length", "Pant Waist", "Rise", "Inseam", "Outseam", "Leg Opening"]}, {"id": "three-piece-suit", "label": "Three-Piece Suit", "file": "three-piece-suit.png", "fields": ["Item Name", "Tagged Size", "Jacket Pit to Pit", "Jacket Waist", "Shoulder", "Sleeve Length", "Jacket Length", "Vest Pit to Pit", "Vest Waist", "Vest Length", "Pant Waist", "Rise", "Pant Thigh", "Inseam", "Outseam", "Leg Opening"]}, {"id": "baseball-jersey", "label": "Baseball Jersey", "file": "baseball-jersey.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"]}, {"id": "basketball-jersey", "label": "Basketball Jersey", "file": "basketball-jersey.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"]}, {"id": "football-jersey", "label": "Football Jersey", "file": "football-jersey.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"]}];
+const TEMPLATES = [{"id": "short-sleeve-tshirt", "label": "Short Sleeve T-Shirt", "file": "short-sleeve-tshirt.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"]}, {"id": "long-sleeve-tshirt", "label": "Long Sleeve T-Shirt", "file": "long-sleeve-tshirt.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"]}, {"id": "tank-top", "label": "Tank Top", "file": "tank-top.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"]}, {"id": "sleeveless-shirt", "label": "Sleeveless Shirt", "file": "sleeveless-shirt.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"]}, {"id": "short-sleeve-polo", "label": "Polo Shirt", "file": "short-sleeve-polo.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"]}, {"id": "long-sleeve-polo", "label": "Long Sleeve Polo", "file": "long-sleeve-polo.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"]}, {"id": "short-sleeve-button-up", "label": "Short Sleeve Button-Up Shirt", "file": "short-sleeve-button-up.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"]}, {"id": "hoodie", "label": "Hoodie", "file": "hoodie.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"]}, {"id": "crewneck-sweatshirt", "label": "Crew Neck Sweatshirt", "file": "crewneck-sweatshirt.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"]}, {"id": "crewneck-sweater", "label": "Crew Neck Sweater", "file": "crewneck-sweater.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"]}, {"id": "jeans", "label": "Jeans", "file": "jeans.png", "fields": ["Item Name", "Tagged Size", "Waist", "Rise", "Thigh", "Inseam", "Outseam", "Leg Opening"]}, {"id": "shorts", "label": "Shorts", "file": "shorts.png", "fields": ["Item Name", "Tagged Size", "Waist", "Rise", "Inseam", "Length", "Leg Opening"]}, {"id": "bib-overalls", "label": "Bib Overalls", "file": "bib-overalls.png", "fields": ["Item Name", "Tagged Size", "Overall Length", "Waist", "Rise", "Thigh", "Inseam", "Leg Opening"]}, {"id": "workwear-jacket", "label": "Workwear Jacket", "file": "workwear-jacket.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Shoulder", "Sleeve Length", "Length"]}, {"id": "denim-jacket", "label": "Denim Jacket", "file": "denim-jacket.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Shoulder", "Sleeve Length", "Length"]}, {"id": "workwear-vest", "label": "Workwear Vest", "file": "workwear-vest.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Shoulder", "Length"]}, {"id": "blazer-sportcoat", "label": "Blazer / Sport Coat", "file": "blazer-sportcoat.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Waist", "Shoulder", "Sleeve Length", "Length"]}, {"id": "two-piece-suit", "label": "Two-Piece Suit", "file": "two-piece-suit.png", "fields": ["Item Name", "Tagged Size", "Jacket Pit to Pit", "Jacket Waist", "Shoulder", "Sleeve Length", "Jacket Length", "Pant Waist", "Rise", "Pant Thigh", "Inseam", "Outseam", "Leg Opening"]}, {"id": "three-piece-suit", "label": "Three-Piece Suit", "file": "three-piece-suit.png", "fields": ["Item Name", "Tagged Size", "Jacket Pit to Pit", "Jacket Waist", "Shoulder", "Sleeve Length", "Jacket Length", "Vest Pit to Pit", "Vest Waist", "Vest Length", "Pant Waist", "Rise", "Pant Thigh", "Inseam", "Outseam", "Leg Opening"]}, {"id": "baseball-jersey", "label": "Baseball Jersey", "file": "baseball-jersey.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"]}, {"id": "basketball-jersey", "label": "Basketball Jersey", "file": "basketball-jersey.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"]}, {"id": "football-jersey", "label": "Football Jersey", "file": "football-jersey.png", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"]}];
 const DEFAULT_POSITIONS = {"Item Name": {"x": 50, "y": 22, "size": 24}, "Tagged Size": {"x": 43, "y": 26.5, "size": 24}, "Pit to Pit": {"x": 48, "y": 45, "size": 34}, "Length": {"x": 58, "y": 53, "size": 34}, "Sleeve Length": {"x": 76, "y": 45, "size": 32}, "Shoulder": {"x": 79, "y": 38, "size": 28}, "Waist": {"x": 46, "y": 35, "size": 28}, "Rise": {"x": 27, "y": 44, "size": 28}, "Thigh": {"x": 45, "y": 57, "size": 28}, "Inseam": {"x": 35, "y": 61, "size": 28}, "Outseam": {"x": 82, "y": 52, "size": 28}, "Leg Opening": {"x": 69, "y": 67, "size": 28}, "Overall Length": {"x": 16, "y": 56, "size": 28}, "Jacket Pit to Pit": {"x": 12, "y": 49, "size": 22}, "Jacket Waist": {"x": 12, "y": 58, "size": 22}, "Jacket Length": {"x": 78, "y": 40, "size": 22}, "Pant Waist": {"x": 12, "y": 77, "size": 22}, "Vest Pit to Pit": {"x": 74, "y": 60, "size": 20}, "Vest Length": {"x": 89, "y": 61, "size": 20}, "Vest Waist": {"x": 74, "y": 66, "size": 20}, "Pant Thigh": {"x": 45, "y": 57, "size": 22}};
-const OVERRIDES = {"bib-overalls": {"Item Name": {"x": 63, "y": 20.8, "size": 22}, "Tagged Size": {"x": 47, "y": 25.8, "size": 22}, "Overall Length": {"x": 16, "y": 56.5, "size": 24}, "Waist": {"x": 72, "y": 34.2, "size": 24}, "Rise": {"x": 91.5, "y": 56.0, "size": 23}, "Thigh": {"x": 67.5, "y": 56.0, "size": 23}, "Inseam": {"x": 64.0, "y": 66.0, "size": 23}, "Leg Opening": {"x": 75.0, "y": 66.2, "size": 23}}, "jeans": {"Item Name": {"x": 63, "y": 20.8, "size": 22}, "Tagged Size": {"x": 47, "y": 25.8, "size": 22}, "Waist": {"x": 54, "y": 31.8, "size": 24}, "Rise": {"x": 20.5, "y": 45.5, "size": 24}, "Thigh": {"x": 50.5, "y": 49.5, "size": 24}, "Inseam": {"x": 28, "y": 57.5, "size": 24}, "Outseam": {"x": 85, "y": 49.5, "size": 24}, "Leg Opening": {"x": 66, "y": 67.5, "size": 24}}, "shorts": {"Item Name": {"x": 63, "y": 20.8, "size": 22}, "Tagged Size": {"x": 47, "y": 25.8, "size": 22}, "Waist": {"x": 54, "y": 32.5, "size": 24}, "Rise": {"x": 20, "y": 46, "size": 24}, "Inseam": {"x": 43, "y": 57, "size": 24}, "Length": {"x": 83, "y": 52, "size": 24}, "Leg Opening": {"x": 66, "y": 64, "size": 24}}, "baseball-jersey": {"Pit to Pit": {"x": 24, "y": 62.5, "size": 24}, "Length": {"x": 78, "y": 64, "size": 24}}, "basketball-jersey": {"Pit to Pit": {"x": 30, "y": 61, "size": 24}, "Length": {"x": 76, "y": 62.5, "size": 24}}, "football-jersey": {"Pit to Pit": {"x": 15, "y": 55, "size": 24}, "Length": {"x": 80, "y": 68, "size": 24}, "Sleeve Length": {"x": 81, "y": 45, "size": 24}}};
+const OVERRIDES = {
+  "short-sleeve-tshirt": {
+    "Item Name": {
+      "x": 67.35077247191012,
+      "y": 20.730337078651687,
+      "size": 25
+    },
+    "Tagged Size": {
+      "x": 44.52817766853933,
+      "y": 25.5859375,
+      "size": 35
+    },
+    "Pit to Pit": {
+      "x": 46.01781952247191,
+      "y": 44.517205056179776,
+      "size": 25
+    },
+    "Length": {
+      "x": 57.528967696629216,
+      "y": 53.28827247191011,
+      "size": 25
+    }
+  },
+  "long-sleeve-tshirt": {
+    "Item Name": {
+      "x": 63.8623595505618,
+      "y": 20.768082865168537,
+      "size": 24
+    },
+    "Tagged Size": {
+      "x": 43.78730688202247,
+      "y": 25.56574789325843,
+      "size": 30
+    },
+    "Pit to Pit": {
+      "x": 45.61666081460674,
+      "y": 44.667310393258425,
+      "size": 25
+    },
+    "Length": {
+      "x": 56.20786516853933,
+      "y": 53.104810393258425,
+      "size": 25
+    },
+    "Sleeve Length": {
+      "x": 77.80196629213482,
+      "y": 44.64229283707865,
+      "size": 25
+    }
+  },
+  "tank-top": {
+    "Item Name": {
+      "x": 61.28686797752809,
+      "y": 21.180214185393258,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 43.43662219101124,
+      "y": 26.438728932584272,
+      "size": 30
+    },
+    "Pit to Pit": {
+      "x": 45.72682584269663,
+      "y": 47.353844803370784,
+      "size": 25
+    },
+    "Length": {
+      "x": 55.213746488764045,
+      "y": 54.18714887640449,
+      "size": 25
+    }
+  },
+  "sleeveless-shirt": {
+    "Item Name": {
+      "x": 60.653089887640455,
+      "y": 20.363412921348313,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 44.31048103932584,
+      "y": 25.635972612359552,
+      "size": 30
+    },
+    "Pit to Pit": {
+      "x": 45.06320224719101,
+      "y": 46.48744733146067,
+      "size": 25
+    },
+    "Length": {
+      "x": 56.0450316011236,
+      "y": 53.32645716292135,
+      "size": 25
+    }
+  },
+  "short-sleeve-polo": {
+    "Item Name": {
+      "x": 64.41932935393258,
+      "y": 20.91599367977528,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 45.060129915730336,
+      "y": 26.01211376404494,
+      "size": 35
+    },
+    "Pit to Pit": {
+      "x": 47.89413623595505,
+      "y": 48.91415028089888,
+      "size": 25
+    },
+    "Length": {
+      "x": 56.64896418539326,
+      "y": 54.27229634831461,
+      "size": 25
+    }
+  },
+  "long-sleeve-polo": {
+    "Item Name": {
+      "x": 61.500175561797754,
+      "y": 20.319961376404493,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 43.382636938202246,
+      "y": 25.805828651685392,
+      "size": 30
+    },
+    "Pit to Pit": {
+      "x": 44.56416783707865,
+      "y": 46.86709971910113,
+      "size": 25
+    },
+    "Length": {
+      "x": 56.14861306179775,
+      "y": 53.268960674157306,
+      "size": 25
+    },
+    "Sleeve Length": {
+      "x": 76.8530547752809,
+      "y": 46.97945926966292,
+      "size": 25
+    }
+  },
+  "short-sleeve-button-up": {
+    "Item Name": {
+      "x": 65.93618328651687,
+      "y": 21.686709971910112,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 42.982794943820224,
+      "y": 26.66037570224719,
+      "size": 30
+    },
+    "Pit to Pit": {
+      "x": 7.81688904494382,
+      "y": 56.80214185393259,
+      "size": 25
+    },
+    "Length": {
+      "x": 79.63175912921349,
+      "y": 71.07004915730337,
+      "size": 25
+    },
+    "Sleeve Length": {
+      "x": 81.15387991573034,
+      "y": 47.874385533707866,
+      "size": 25
+    }
+  },
+  "hoodie": {
+    "Item Name": {
+      "x": 62.643082865168545,
+      "y": 21.033620084269664,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 43.40414325842696,
+      "y": 26.29125702247191,
+      "size": 30
+    },
+    "Pit to Pit": {
+      "x": 45.964273174157306,
+      "y": 47.320926966292134,
+      "size": 25
+    },
+    "Length": {
+      "x": 55.73867626404494,
+      "y": 52.7247191011236,
+      "size": 25
+    },
+    "Sleeve Length": {
+      "x": 76.87324438202248,
+      "y": 46.815308988764045,
+      "size": 25
+    }
+  },
+  "crewneck-sweatshirt": {
+    "Item Name": {
+      "x": 65.79310042134831,
+      "y": 20.68776334269663,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 43.19434691011236,
+      "y": 25.708830758426966,
+      "size": 30
+    },
+    "Pit to Pit": {
+      "x": 45.962078651685395,
+      "y": 45.28177668539326,
+      "size": 25
+    },
+    "Length": {
+      "x": 57.1971558988764,
+      "y": 53.63632373595506,
+      "size": 25
+    },
+    "Sleeve Length": {
+      "x": 77.22480688202246,
+      "y": 45.250175561797754,
+      "size": 25
+    }
+  },
+  "crewneck-sweater": {
+    "Item Name": {
+      "x": 62.34199438202247,
+      "y": 20.890537219101123,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 44.1186797752809,
+      "y": 26.377282303370787,
+      "size": 30
+    },
+    "Pit to Pit": {
+      "x": 46.10252808988764,
+      "y": 45.57452598314607,
+      "size": 25
+    },
+    "Length": {
+      "x": 56.77536867977528,
+      "y": 54.17354283707865,
+      "size": 25
+    },
+    "Sleeve Length": {
+      "x": 77.70891853932585,
+      "y": 45.77861657303371,
+      "size": 25
+    }
+  },
+  "jeans": {
+    "Item Name": {
+      "x": 67.89457514044945,
+      "y": 20.540291432584272,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 45.90589887640449,
+      "y": 25.03335674157303,
+      "size": 30
+    },
+    "Waist": {
+      "x": 41.671348314606746,
+      "y": 30.174683988764045,
+      "size": 20
+    },
+    "Rise": {
+      "x": 18.037658005617978,
+      "y": 45.20101825842697,
+      "size": 20
+    },
+    "Thigh": {
+      "x": 43.36332514044944,
+      "y": 54.186709971910105,
+      "size": 20
+    },
+    "Inseam": {
+      "x": 41.891678370786515,
+      "y": 64.99473314606742,
+      "size": 20
+    },
+    "Outseam": {
+      "x": 81.66344803370787,
+      "y": 55.67064606741573,
+      "size": 20
+    },
+    "Leg Opening": {
+      "x": 71.99306530898878,
+      "y": 72.48946629213484,
+      "size": 20
+    }
+  },
+  "shorts": {
+    "Item Name": {
+      "x": 66.69987710674158,
+      "y": 21.299596207865168,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 43.38483146067416,
+      "y": 25.80977879213483,
+      "size": 30
+    },
+    "Waist": {
+      "x": 55.20014044943821,
+      "y": 31.461113061797754,
+      "size": 20
+    },
+    "Rise": {
+      "x": 26.028353230337082,
+      "y": 44.45356390449438,
+      "size": 20
+    },
+    "Inseam": {
+      "x": 40.30635533707866,
+      "y": 62.003599016853926,
+      "size": 20
+    },
+    "Length": {
+      "x": 77.4806882022472,
+      "y": 52.66283356741573,
+      "size": 20
+    },
+    "Leg Opening": {
+      "x": 66.95926966292134,
+      "y": 70.99324087078651,
+      "size": 20
+    }
+  },
+  "bib-overalls": {
+    "Item Name": {
+      "x": 63.83163623595506,
+      "y": 20.131232443820224,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 45.995874297752806,
+      "y": 24.408795646067418,
+      "size": 30
+    },
+    "Overall Length": {
+      "x": 15.807145365168541,
+      "y": 56.92152387640449,
+      "size": 20
+    },
+    "Waist": {
+      "x": 46.05732092696629,
+      "y": 46.17143609550562,
+      "size": 20
+    },
+    "Rise": {
+      "x": 79.72831811797752,
+      "y": 52.061973314606746,
+      "size": 20
+    },
+    "Thigh": {
+      "x": 46.57303370786517,
+      "y": 57.474543539325836,
+      "size": 20
+    },
+    "Inseam": {
+      "x": 39.03484901685393,
+      "y": 65.52273525280899,
+      "size": 18
+    },
+    "Leg Opening": {
+      "x": 48.16625702247191,
+      "y": 71.85700491573034,
+      "size": 18
+    }
+  },
+  "workwear-jacket": {
+    "Item Name": {
+      "x": 66.25043890449437,
+      "y": 19.511938202247194,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 44.42547401685393,
+      "y": 23.93653441011236,
+      "size": 30
+    },
+    "Pit to Pit": {
+      "x": 8.13597261235955,
+      "y": 54.61859199438203,
+      "size": 25
+    },
+    "Shoulder": {
+      "x": 79.02826544943821,
+      "y": 39.55714536516854,
+      "size": 20
+    },
+    "Sleeve Length": {
+      "x": 79.4044066011236,
+      "y": 56.39966643258427,
+      "size": 20
+    },
+    "Length": {
+      "x": 78.4032654494382,
+      "y": 71.17626404494382,
+      "size": 20
+    }
+  },
+  "denim-jacket": {
+    "Item Name": {
+      "x": 66.8188202247191,
+      "y": 19.28809691011236,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 44.02738764044944,
+      "y": 23.770189606741575,
+      "size": 30
+    },
+    "Pit to Pit": {
+      "x": 8.222875702247192,
+      "y": 54.10331811797753,
+      "size": 25
+    },
+    "Shoulder": {
+      "x": 78.14913974719101,
+      "y": 38.388342696629216,
+      "size": 22
+    },
+    "Sleeve Length": {
+      "x": 80.56750351123596,
+      "y": 56.41941713483146,
+      "size": 23
+    },
+    "Length": {
+      "x": 78.98876404494382,
+      "y": 71.80565308988764,
+      "size": 20
+    }
+  },
+  "workwear-vest": {
+    "Item Name": {
+      "x": 65.61095505617978,
+      "y": 19.632636938202246,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 43.39317064606741,
+      "y": 24.14325842696629,
+      "size": 30
+    },
+    "Pit to Pit": {
+      "x": 8.191713483146067,
+      "y": 55.50079002808989,
+      "size": 25
+    },
+    "Shoulder": {
+      "x": 77.43328651685393,
+      "y": 41.57742275280899,
+      "size": 25
+    },
+    "Length": {
+      "x": 76.99087078651685,
+      "y": 65.6153441011236,
+      "size": 25
+    }
+  },
+  "blazer-sportcoat": {
+    "Item Name": {
+      "x": 65.11982092696628,
+      "y": 19.113412921348313,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 43.62183988764045,
+      "y": 23.629740168539325,
+      "size": 30
+    },
+    "Pit to Pit": {
+      "x": 10.665818117977528,
+      "y": 51.97858146067416,
+      "size": 22
+    },
+    "Waist": {
+      "x": 10.953300561797754,
+      "y": 72.27747542134831,
+      "size": 22
+    },
+    "Shoulder": {
+      "x": 10.653967696629213,
+      "y": 37.90203651685393,
+      "size": 22
+    },
+    "Sleeve Length": {
+      "x": 78.27686095505618,
+      "y": 64.10551264044943,
+      "size": 22
+    },
+    "Length": {
+      "x": 78.7473665730337,
+      "y": 45.00614466292135,
+      "size": 22
+    }
+  },
+  "two-piece-suit": {
+    "Item Name": {
+      "x": 65.9230161516854,
+      "y": 19.2797577247191,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 45.01492275280899,
+      "y": 22.86429073033708,
+      "size": 30
+    },
+    "Jacket Pit to Pit": {
+      "x": 7.703651685393259,
+      "y": 48.44013342696629,
+      "size": 22
+    },
+    "Jacket Waist": {
+      "x": 7.461376404494382,
+      "y": 65.06934691011236,
+      "size": 22
+    },
+    "Shoulder": {
+      "x": 8.355424859550562,
+      "y": 38.30714536516854,
+      "size": 22
+    },
+    "Sleeve Length": {
+      "x": 77.61192064606742,
+      "y": 57.791871488764045,
+      "size": 22
+    },
+    "Jacket Length": {
+      "x": 77.26343047752809,
+      "y": 41.10252808988764,
+      "size": 22
+    },
+    "Pant Waist": {
+      "x": 7.494733146067416,
+      "y": 77.48244382022472,
+      "size": 20
+    },
+    "Rise": {
+      "x": 6.695488061797753,
+      "y": 88.34313553370787,
+      "size": 20
+    },
+    "Inseam": {
+      "x": 41.875,
+      "y": 78.53844803370787,
+      "size": 20
+    },
+    "Outseam": {
+      "x": 69.6339536516854,
+      "y": 77.74885884831461,
+      "size": 20
+    },
+    "Leg Opening": {
+      "x": 69.4434691011236,
+      "y": 87.37666783707864,
+      "size": 19
+    },
+    "Pant Thigh": {
+      "x": 41.9,
+      "y": 86.0,
+      "size": 20
+    }
+  },
+  "three-piece-suit": {
+    "Item Name": {
+      "x": 62.19540028089887,
+      "y": 18.318995786516854,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 43.116221910112365,
+      "y": 22.333216292134832,
+      "size": 30
+    },
+    "Jacket Pit to Pit": {
+      "x": 6.913623595505618,
+      "y": 45.49991221910113,
+      "size": 20
+    },
+    "Jacket Waist": {
+      "x": 6.849543539325843,
+      "y": 62.26694171348315,
+      "size": 20
+    },
+    "Shoulder": {
+      "x": 6.514220505617978,
+      "y": 36.46681882022472,
+      "size": 20
+    },
+    "Sleeve Length": {
+      "x": 58.927756320224724,
+      "y": 54.669066011235955,
+      "size": 20
+    },
+    "Jacket Length": {
+      "x": 58.55117626404495,
+      "y": 39.74411867977528,
+      "size": 20
+    },
+    "Vest Pit to Pit": {
+      "x": 69.19812148876404,
+      "y": 60.44373244382022,
+      "size": 20
+    },
+    "Vest Waist": {
+      "x": 78.75833918539325,
+      "y": 60.62895014044943,
+      "size": 20
+    },
+    "Vest Length": {
+      "x": 88.73902738764045,
+      "y": 63.60472261235955,
+      "size": 20
+    },
+    "Pant Waist": {
+      "x": 6.401422050561798,
+      "y": 75.51483497191012,
+      "size": 20
+    },
+    "Rise": {
+      "x": 5.645628511235954,
+      "y": 86.58137289325842,
+      "size": 22
+    },
+    "Pant Thigh": {
+      "x": 37.53335674157303,
+      "y": 85.62324438202246,
+      "size": 22
+    },
+    "Inseam": {
+      "x": 37.291959269662925,
+      "y": 76.48832514044945,
+      "size": 22
+    },
+    "Outseam": {
+      "x": 65.90984901685393,
+      "y": 76.26755617977527,
+      "size": 22
+    },
+    "Leg Opening": {
+      "x": 68.38570926966293,
+      "y": 85.96471207865169,
+      "size": 22
+    }
+  },
+  "baseball-jersey": {
+    "Item Name": {
+      "x": 66.50280898876404,
+      "y": 20.279143258426966,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 45.447682584269664,
+      "y": 24.85033356741573,
+      "size": 30
+    },
+    "Pit to Pit": {
+      "x": 22.866046348314605,
+      "y": 61.98209269662921,
+      "size": 22
+    },
+    "Length": {
+      "x": 77.99903441011236,
+      "y": 63.54459269662921,
+      "size": 22
+    }
+  },
+  "basketball-jersey": {
+    "Item Name": {
+      "x": 65.17380617977528,
+      "y": 20.04784058988764,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 44.197682584269664,
+      "y": 24.02387640449438,
+      "size": 30
+    },
+    "Pit to Pit": {
+      "x": 26.414150280898873,
+      "y": 60.59515449438202,
+      "size": 24
+    },
+    "Length": {
+      "x": 72.69399578651685,
+      "y": 61.44575140449439,
+      "size": 24
+    }
+  },
+  "football-jersey": {
+    "Item Name": {
+      "x": 67.13483146067416,
+      "y": 18.82505266853933,
+      "size": 22
+    },
+    "Tagged Size": {
+      "x": 45.16020014044943,
+      "y": 23.466028792134832,
+      "size": 30
+    },
+    "Pit to Pit": {
+      "x": 8.16450140449438,
+      "y": 53.139483848314605,
+      "size": 24
+    },
+    "Length": {
+      "x": 81.61429073033707,
+      "y": 67.88228581460675,
+      "size": 24
+    },
+    "Sleeve Length": {
+      "x": 82.0093047752809,
+      "y": 43.925122893258425,
+      "size": 24
+    }
+  }
+};
 let current=TEMPLATES[0],values={},positions={},calibrating=false,selectedField=null;
 const $=id=>document.getElementById(id);
 function defaultPos(f){return (OVERRIDES[current.id]&&OVERRIDES[current.id][f])?{...OVERRIDES[current.id][f]}:(DEFAULT_POSITIONS[f]?{...DEFAULT_POSITIONS[f]}:{x:50,y:50,size:28})}
-function loadPositions(){let p={};current.fields.forEach(f=>p[f]=defaultPos(f));try{let saved=JSON.parse(localStorage.getItem("py_pos_v2_"+current.id)||"{}");Object.assign(p,saved)}catch(e){}return p}
-function savePositions(){current.fields.forEach(f=>{positions[f]=positions[f]||defaultPos(f);positions[f].x=Number(positions[f].x);positions[f].y=Number(positions[f].y);positions[f].size=Number(positions[f].size||defaultPos(f).size||28)});localStorage.setItem("py_pos_v2_"+current.id,JSON.stringify(positions));alert("Text positions and sizes saved for "+current.label)}
+function loadPositions(){let p={};current.fields.forEach(f=>p[f]=defaultPos(f));try{let saved=JSON.parse(localStorage.getItem("py_pos_v3_"+current.id)||"{}");Object.assign(p,saved)}catch(e){}return p}
+function savePositions(){current.fields.forEach(f=>{positions[f]=positions[f]||defaultPos(f);positions[f].x=Number(positions[f].x);positions[f].y=Number(positions[f].y);positions[f].size=Number(positions[f].size||defaultPos(f).size||28)});localStorage.setItem("py_pos_v3_"+current.id,JSON.stringify(positions));alert("Text positions and sizes saved for "+current.label)}
 function init(){TEMPLATES.forEach((t,i)=>{let o=document.createElement("option");o.value=i;o.textContent=t.label;$("templateSelect").appendChild(o)});$("templateSelect").onchange=()=>loadTemplate(Number($("templateSelect").value));loadTemplate(0)}
-function loadTemplate(i){current=TEMPLATES[i];values={};selectedField=null;positions=loadPositions();let img=$("templateImg");img.src=current.file+"?v=2";img.onload=()=>{$("status").innerHTML='<span class="loaded">✅ Loaded: '+current.label+'</span>';renderOverlay()};img.onerror=()=>{$("status").innerHTML='<span class="missing">❌ Missing image: '+current.file+'</span>'};renderFields();renderOverlay()}
+function loadTemplate(i){current=TEMPLATES[i];values={};selectedField=null;positions=loadPositions();let fc=$("fontControls");if(fc)fc.classList.toggle("hidden",!calibrating);let img=$("templateImg");img.src=current.file+"?v=3";img.onload=()=>{$("status").innerHTML='<span class="loaded">✅ Loaded: '+current.label+'</span>';renderOverlay()};img.onerror=()=>{$("status").innerHTML='<span class="missing">❌ Missing image: '+current.file+'</span>'};renderFields();renderOverlay()}
 function renderFields(){let box=$("fields");box.innerHTML="";current.fields.forEach(f=>{let l=document.createElement("label");l.textContent=f;let inp=document.createElement("input");inp.placeholder=f;inp.value=values[f]||"";inp.oninput=()=>{values[f]=inp.value;renderOverlay()};box.appendChild(l);box.appendChild(inp)})}
 function isMeasure(f){return f!=="Item Name"&&f!=="Tagged Size"}function fmt(f,v){v=String(v||"").trim();if(!v)return"";return v}
 function updateSelectedUI(){let name=$("selectedFieldName"),size=$("fontSizeReadout");if(!name||!size)return;if(selectedField&&positions[selectedField]){name.textContent=selectedField;size.textContent=positions[selectedField].size||28}else{name.textContent="None";size.textContent="—"}}
@@ -52,14 +772,14 @@ function selectFieldOnly(f){selectedField=f;updateSelectedUI();document.querySel
 function changeFontSize(delta){if(!selectedField){alert("Tap or drag a text field first while Position Adjust Mode is on.");return}positions[selectedField]=positions[selectedField]||defaultPos(selectedField);positions[selectedField].size=Math.max(8,Math.min(90,(positions[selectedField].size||28)+delta));updateSelectedUI();renderOverlay()}
 function renderOverlay(){let layer=$("overlay"),wrap=$("preview");layer.innerHTML="";wrap.classList.toggle("calibrating",calibrating);current.fields.forEach(f=>{let p=positions[f]||defaultPos(f),v=fmt(f,values[f]);if(!v&&!calibrating)return;let d=document.createElement("div");d.className="overlay"+(selectedField===f?" selected":"");d.dataset.field=f;d.textContent=v||f;d.style.left=p.x+"%";d.style.top=p.y+"%";d.style.fontSize=Math.max(11,wrap.clientWidth*((p.size||28)/1254))+"px";d.style.opacity=v?1:.62;if(calibrating)drag(d,f);layer.appendChild(d)});updateSelectedUI()}
 function drag(el,f){let down=false;function move(x,y){let r=$("preview").getBoundingClientRect();positions[f]=positions[f]||defaultPos(f);positions[f].x=Math.max(0,Math.min(100,(x-r.left)/r.width*100));positions[f].y=Math.max(0,Math.min(100,(y-r.top)/r.height*100));el.style.left=positions[f].x+"%";el.style.top=positions[f].y+"%"}el.onpointerdown=e=>{down=true;e.preventDefault();selectFieldOnly(f);try{el.setPointerCapture(e.pointerId)}catch(err){}move(e.clientX,e.clientY)};el.onpointermove=e=>{if(down){e.preventDefault();move(e.clientX,e.clientY)}};el.onpointerup=e=>{down=false;try{el.releasePointerCapture(e.pointerId)}catch(err){}};el.onclick=e=>{e.preventDefault();selectFieldOnly(f)}}
-$("calibrateBtn").onclick=()=>{calibrating=!calibrating;$("calibrateBtn").textContent=calibrating?"Turn Off Position Adjust Mode":"Turn On Position Adjust Mode";renderOverlay()};$("smallerBtn").onclick=()=>changeFontSize(-1);$("largerBtn").onclick=()=>changeFontSize(1);
-$("saveBtn").onclick=savePositions;$("resetBtn").onclick=()=>{if(confirm("Reset positions for this template?")){localStorage.removeItem("py_pos_v2_"+current.id);positions=loadPositions();renderOverlay()}};
+$("calibrateBtn").onclick=()=>{calibrating=!calibrating;$("calibrateBtn").textContent=calibrating?"Turn Off Position Adjust Mode":"Turn On Position Adjust Mode";let fc=$("fontControls");if(fc)fc.classList.toggle("hidden",!calibrating);renderOverlay()};$("smallerBtn").onclick=()=>changeFontSize(-1);$("largerBtn").onclick=()=>changeFontSize(1);
+$("saveBtn").onclick=savePositions;$("resetBtn").onclick=()=>{if(confirm("Reset positions for this template?")){localStorage.removeItem("py_pos_v3_"+current.id);positions=loadPositions();renderOverlay()}};
 $("clearBtn").onclick=()=>loadTemplate(Number($("templateSelect").value));
 function buildExportCanvas(){let img=$("templateImg");if(!img.complete||img.naturalWidth===0){alert("Template image is missing or still loading.");return null}let c=document.createElement("canvas");c.width=img.naturalWidth;c.height=img.naturalHeight;let ctx=c.getContext("2d");ctx.drawImage(img,0,0);current.fields.forEach(f=>{let v=fmt(f,values[f]);if(!v)return;let p=positions[f]||defaultPos(f),size=Math.round((p.size||28)*(c.width/1254));ctx.fillStyle="#061b3a";ctx.font="900 "+size+"px Arial, sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(v,p.x/100*c.width,p.y/100*c.height)});return c}
 function exportFileName(){return (values["Item Name"]||current.label).replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,"")+".png"}
 $("exportBtn").onclick=()=>{let c=buildExportCanvas();if(!c)return;c.toBlob(async blob=>{let file=new File([blob],exportFileName(),{type:"image/png"});if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:exportFileName(),text:"Save this image to Photos."});return}catch(e){}}let a=document.createElement("a");a.download=exportFileName();a.href=URL.createObjectURL(blob);a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png")};
 
-function exportCalibration(){let data={};TEMPLATES.forEach(t=>{try{let saved=JSON.parse(localStorage.getItem("py_pos_v2_"+t.id)||"{}");if(saved&&Object.keys(saved).length)data[t.id]=saved}catch(e){}});let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.download="porky-yorkie-calibration.json";a.href=URL.createObjectURL(blob);a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function exportCalibration(){let data={};TEMPLATES.forEach(t=>{try{let saved=JSON.parse(localStorage.getItem("py_pos_v3_"+t.id)||"{}");if(saved&&Object.keys(saved).length)data[t.id]=saved}catch(e){}});let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.download="porky-yorkie-calibration.json";a.href=URL.createObjectURL(blob);a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 if($("exportCalibrationBtn")){$("exportCalibrationBtn").onclick=exportCalibration;}
 
 window.onresize=renderOverlay;init();
