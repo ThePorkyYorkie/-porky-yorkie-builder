@@ -31,7 +31,7 @@ details{margin-top:14px;border-top:1px solid #eee;padding-top:12px}summary{font-
 <button class="green" id="exportBtn">Save to Photos</button><button class="secondary" id="clearBtn">Clear Fields</button>
 <details open><summary>Position Adjust Mode</summary><p class="small">Turn on, drag text to exact spots, then save. Saved positions stay on this device.</p>
 <button class="secondary" id="calibrateBtn">Turn On Position Adjust Mode</button>
-<div class="row"><button class="green" id="saveBtn">Save Text Positions + Sizes</button><button class="red" id="resetBtn">Reset Positions</button></div>
+<div class="row"><button class="green" id="saveBtn">Save Text Positions + Sizes</button><button class="red" id="resetBtn">Reset Positions</button></div><button class="secondary" id="exportCalibrationBtn">Export Calibration File</button>
 </details><p class="note">Measurements automatically add the inch mark.</p></aside>
 <section class="card"><div id="preview" class="preview"><img id="templateImg"><div id="overlay"></div></div></section></section></main>
 <script>
@@ -58,5 +58,9 @@ $("clearBtn").onclick=()=>loadTemplate(Number($("templateSelect").value));
 function buildExportCanvas(){let img=$("templateImg");if(!img.complete||img.naturalWidth===0){alert("Template image is missing or still loading.");return null}let c=document.createElement("canvas");c.width=img.naturalWidth;c.height=img.naturalHeight;let ctx=c.getContext("2d");ctx.drawImage(img,0,0);current.fields.forEach(f=>{let v=fmt(f,values[f]);if(!v)return;let p=positions[f]||defaultPos(f),size=Math.round((p.size||28)*(c.width/1254));ctx.fillStyle="#061b3a";ctx.font="900 "+size+"px Arial, sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(v,p.x/100*c.width,p.y/100*c.height)});return c}
 function exportFileName(){return (values["Item Name"]||current.label).replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,"")+".png"}
 $("exportBtn").onclick=()=>{let c=buildExportCanvas();if(!c)return;c.toBlob(async blob=>{let file=new File([blob],exportFileName(),{type:"image/png"});if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:exportFileName(),text:"Save this image to Photos."});return}catch(e){}}let a=document.createElement("a");a.download=exportFileName();a.href=URL.createObjectURL(blob);a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},"image/png")};
+
+function exportCalibration(){let data={};TEMPLATES.forEach(t=>{try{let saved=JSON.parse(localStorage.getItem("py_pos_v2_"+t.id)||"{}");if(saved&&Object.keys(saved).length)data[t.id]=saved}catch(e){}});let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.download="porky-yorkie-calibration.json";a.href=URL.createObjectURL(blob);a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+if($("exportCalibrationBtn")){$("exportCalibrationBtn").onclick=exportCalibration;}
+
 window.onresize=renderOverlay;init();
 </script></body></html>
