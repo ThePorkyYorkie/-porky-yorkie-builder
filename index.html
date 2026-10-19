@@ -230,9 +230,8 @@ function formatValue(field, val) {
   const measurementWords = ["Pit to Pit","Length","Sleeve Length","Waist","Rise","Inseam","Outseam","Leg Opening","Thigh","Overall Length","Shoulder","Jacket Pit to Pit","Jacket Waist","Jacket Length","Pant Waist","Vest Pit to Pit","Vest Length"];
   if (measurementWords.includes(field)) {
     const trimmed = String(val).trim();
-    if (currentKey === "lightweight_jackets") return trimmed.replace(/\s*["″]\s*$/, "");
-    if (trimmed.endsWith('"')) return trimmed;
-    return trimmed + '"';
+    return trimmed.replace(/\s*(?:["″]|inches|inch|in)\s*$/i, "");
+
   }
   return val;
 }
