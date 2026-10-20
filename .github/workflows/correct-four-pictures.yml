@@ -1,0 +1,41 @@
+name: Correct four garment pictures
+on:
+  push:
+    paths:
+      - '.github/workflows/correct-four-pictures.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  correct:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Correct image assignments only
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text()
+          expected={
+            'sweater':('D85A1D86-87A3-4C88-8FC5-115C053CA5F5.png','03DEC799-922B-4278-A912-94AB4B92A3B8.png'),
+            'cardigan':('D20EE804-FC3F-4A5A-B8F8-DDBA1030065C.png','2F9C3857-20DA-4A80-A454-D4509D853ECC.png'),
+            'hooded_jacket':('03DEC799-922B-4278-A912-94AB4B92A3B8.png','D20EE804-FC3F-4A5A-B8F8-DDBA1030065C.png'),
+            'bomber_jacket':('2F9C3857-20DA-4A80-A454-D4509D853ECC.png','D85A1D86-87A3-4C88-8FC5-115C053CA5F5.png'),
+          }
+          for key,(old,new) in expected.items():
+              if not Path(new).is_file(): raise SystemExit('Missing '+new)
+              pattern=r'("'+re.escape(key)+r'"\s*:\s*\{[^{}]*?"embedded"\s*:\s*"\./)'+re.escape(old)+r'(")'
+              s,n=re.subn(pattern,lambda m:m.group(1)+new+m.group(2),s,count=1)
+              if n!=1: raise SystemExit('Safe stop: unexpected definition for '+key)
+          p.write_text(s)
+          print('Corrected exactly four image assignments')
+          PY
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Correct four new garment image assignments"
+          git push
