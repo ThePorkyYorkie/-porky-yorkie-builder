@@ -1,0 +1,34 @@
+name: Diagnose guide image mapping
+on:
+  push:
+    paths:
+      - '.github/workflows/diagnose-guide-images.yml'
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect builder image logic
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text()
+          out=[]
+          for k in ('sweater','cardigan','hooded_jacket','bomber_jacket'):
+            for m in list(re.finditer(re.escape(k),s))[:8]:
+              out.append(k+' @'+str(m.start())+' '+s[max(0,m.start()-100):m.start()+330].replace('\n',' ')[:430])
+          for needle in ('function getTemplateImage','function render(','const TEMPLATES','templateImage.src','function getPositions','embedded'):
+            m=re.search(re.escape(needle),s)
+            if m:out.append(needle+' '+s[m.start():m.start()+1100].replace('\n',' '))
+          Path('guide-image-diagnostic.txt').write_text('\n'.join(out)[:16000])
+          PY
+      - name: Commit diagnostic
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add guide-image-diagnostic.txt
+          git commit -m "Record image mapping diagnostic"
+          git push
