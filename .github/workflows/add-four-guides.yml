@@ -1,0 +1,53 @@
+name: Add four measurement guides
+on:
+  push:
+    paths:
+      - '.github/workflows/add-four-guides.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Insert four templates without replacing the builder
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text()
+          if all(re.search(r'["\']'+k+r'["\']\s*:',s) for k in ('sweater','cardigan','hooded_jacket','bomber_jacket')):
+              print('All four template keys already present; no changes')
+              raise SystemExit(0)
+          marker=re.search(r'\bconst\s+TEMPLATES\s*=\s*\{',s)
+          if not marker:
+              raise SystemExit('Safe stop: TEMPLATES object not found')
+          guides=[
+            ('sweater','Sweater','D85A1D86-87A3-4C88-8FC5-115C053CA5F5.png'),
+            ('cardigan','Cardigan','D20EE804-FC3F-4A5A-B8F8-DDBA1030065C.png'),
+            ('hooded_jacket','Hooded Jacket','03DEC799-922B-4278-A912-94AB4B92A3B8.png'),
+            ('bomber_jacket','Bomber Jacket','2F9C3857-20DA-4A80-A454-D4509D853ECC.png'),
+          ]
+          import json
+          entries=[]
+          for key,label,img in guides:
+              if not Path(img).is_file(): raise SystemExit('Safe stop: missing '+img)
+              if re.search(r'["\']'+key+r'["\']\s*:',s): continue
+              entries.append(json.dumps(key)+':'+json.dumps({'label':label,'fields':['Item Name','Tagged Size','Pit to Pit','Shoulder','Sleeve Length','Length'],'embedded':'./'+img})+',')
+          s=s[:marker.end()]+''.join(entries)+s[marker.end():]
+          p.write_text(s)
+          print('Added',len(entries),'template definitions')
+          PY
+      - name: Commit only when changed
+        run: |
+          if ! git diff --quiet -- index.html; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add index.html
+            git commit -m "Add Sweater Cardigan Hooded Jacket and Bomber Jacket guides"
+            git push
+          fi
