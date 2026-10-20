@@ -164,7 +164,7 @@ const calibrateBtn = document.getElementById("calibrateBtn");
 const savePositionsBtn = document.getElementById("savePositionsBtn");
 
 function initDropdown() {
-  Object.entries(TEMPLATES).forEach(([key, t]) => {
+  Object.entries(TEMPLATES).sort((a, b) => a[1].label.localeCompare(b[1].label)).forEach(([key, t]) => {
     const opt = document.createElement("option");
     opt.value = key;
     opt.textContent = t.label;
