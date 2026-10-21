@@ -205,7 +205,7 @@ function initDropdown() {
 }
 
 function storageKey(type, key) {
-  return STORAGE_PREFIX + type + "_" + key + (type === "short_sleeve_tshirt" && key === "positions" ? "_measurement_boxes_v2" : "");
+  return STORAGE_PREFIX + type + "_" + key + (key === "image" ? "_verified_masters_v1" : (type === "short_sleeve_tshirt" && key === "positions" ? "_measurement_boxes_v2" : ""));
 }
 
 function getTemplateImage(key) {
