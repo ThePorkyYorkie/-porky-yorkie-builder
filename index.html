@@ -112,6 +112,10 @@ button.warn {
   gap:8px;
 }
 .hidden { display:none; }
+.title-fit { margin-top:6px; padding:8px 10px; border-radius:8px; background:#f3f5f7; font-size:13px; line-height:1.4; }
+.title-fit meter { display:block; width:100%; height:14px; margin:4px 0; }
+.title-fit[data-state="nearly-full"] { background:#fff4d5; }
+.title-fit[data-state="too-long"], .title-fit[data-state="position"] { background:#ffe6e6; color:#8b1e1e; }
 #finishedDialog {
   box-sizing:border-box;
   width:min(94vw,900px);
@@ -286,6 +290,46 @@ async function render() {
   }
 }
 
+// Title areas measured from each supplied guide. Positions and font sizes remain user settings.
+const TITLE_LINE_BOUNDS = {"chore_jacket": [37.7, 97], "sweater": [37.7, 97], "cardigan": [37.7, 97], "hooded_jacket": [37.8, 97], "bomber_jacket": [37.8, 97], "short_sleeve_tshirt": [39.8, 97], "long_sleeve_tshirt": [39.0, 97], "crewneck_sweatshirt": [39.0, 97], "crewneck_sweater": [39.4, 97], "hoodie": [38.5, 97], "polo": [39.5, 97], "long_sleeve_polo": [39.2, 97], "tank_top": [39.1, 97], "sleeveless_shirt": [39.7, 97], "basketball_jersey": [37.6, 97], "baseball_jersey": [38.5, 97], "football_jersey": [38.7, 97], "button_up_short_sleeve": [37.9, 97], "shorts": [39.6, 97], "jeans": [39.5, 97], "bib_overalls": [38.8, 97], "blazer_sportcoat": [38.1, 97], "two_piece_suit": [38.9, 97], "three_piece_suit": [36.7, 97], "denim_jacket": [39.0, 97], "workwear_vest": [38.7, 97], "sweater_vest": [38.4, 97], "workwear_jacket": [38.8, 97], "lightweight_jackets": [39.0, 97]};
+const titleMeasureContext = document.createElement("canvas").getContext("2d");
+
+function measureTitleFit(text, key, pos, imageWidth) {
+  const characters = Array.from(text).length;
+  const [left, right] = TITLE_LINE_BOUNDS[key];
+  const halfWidth = Math.min(pos.x - left, right - pos.x);
+  const available = Math.max(0, halfWidth * 2 * imageWidth / 100);
+  const fontSize = Math.round(fieldFontSize("Item Name", pos) * imageWidth / 1254);
+  titleMeasureContext.font = "900 " + fontSize + "px Arial, sans-serif";
+  const metrics = titleMeasureContext.measureText(text);
+  const textWidth = Math.max(metrics.width, (metrics.actualBoundingBoxLeft || 0) + (metrics.actualBoundingBoxRight || 0));
+  const usedPercent = available > 0 ? Math.round(textWidth / available * 100) : 0;
+  const averageWidth = characters > 0 && textWidth > 0 ? textWidth / characters : 0;
+  const remaining = averageWidth > 0 ? Math.floor(Math.max(0, available - textWidth) / averageWidth) : 0;
+  const overBy = averageWidth > 0 ? Math.ceil(Math.max(0, textWidth - available) / averageWidth) : 0;
+  const state = available <= 0 ? "position" : textWidth > available ? "too-long" : usedPercent >= 85 ? "nearly-full" : "fits";
+  return {characters, available, textWidth, usedPercent, remaining, overBy, state};
+}
+
+function updateTitleFit() {
+  const counter = document.getElementById("titleFitCounter");
+  if (!counter || !titleMeasureContext) return;
+  const text = values["Item Name"] || "";
+  const pos = positions["Item Name"] || DEFAULT_POSITIONS["Item Name"];
+  const width = templateImage.naturalWidth || (TEMPLATES[currentKey].embedded.startsWith("guides/") ? 1248 : 1254);
+  const fit = measureTitleFit(text, currentKey, pos, width);
+  document.getElementById("titleFitCount").textContent = fit.characters + " characters" + (text && fit.available > 0 ? " · " + fit.usedPercent + "% of title space" : "");
+  document.getElementById("titleFitMeter").value = Math.min(100, fit.usedPercent);
+  counter.dataset.state = text ? fit.state : "fits";
+  let message = "Type your title to check how much fits. Font size stays fixed.";
+  if (text) {
+    if (fit.state === "position") message = "The title center is outside its writing area. Move it into the title line in Position Adjust Mode.";
+    else if (fit.state === "too-long") message = "Too long — shorten by about " + fit.overBy + " similar-width characters. Font size stays fixed.";
+    else message = (fit.state === "nearly-full" ? "Nearly full. " : "Fits. ") + "About " + fit.remaining + " more similar-width characters fit. Font size stays fixed.";
+  }
+  document.getElementById("titleFitMessage").textContent = message;
+}
+
 function renderFields() {
   fieldsDiv.innerHTML = "";
   TEMPLATES[currentKey].fields.forEach(field => {
@@ -300,6 +344,29 @@ function renderFields() {
     });
     fieldsDiv.appendChild(label);
     fieldsDiv.appendChild(input);
+    if (field === "Item Name") {
+      input.id = "itemNameInput";
+      input.setAttribute("aria-describedby", "titleFitCount titleFitMessage");
+      const counter = document.createElement("div");
+      counter.id = "titleFitCounter";
+      counter.className = "title-fit";
+      const count = document.createElement("div");
+      count.id = "titleFitCount";
+      const meter = document.createElement("meter");
+      meter.id = "titleFitMeter";
+      meter.min = 0;
+      meter.max = 100;
+      meter.low = 85;
+      meter.high = 99;
+      meter.optimum = 0;
+      meter.setAttribute("aria-label", "Title space used");
+      const message = document.createElement("div");
+      message.id = "titleFitMessage";
+      counter.appendChild(count);
+      counter.appendChild(meter);
+      counter.appendChild(message);
+      fieldsDiv.appendChild(counter);
+    }
   });
 }
 
@@ -332,6 +399,7 @@ function renderOverlay() {
     if (calibrate) makeDraggable(div, field);
     overlayLayer.appendChild(div);
   });
+  updateTitleFit();
 }
 
 function makeDraggable(el, field) {
@@ -342,6 +410,7 @@ function makeDraggable(el, field) {
     positions[field].y = Math.max(0, Math.min(100, ((clientY - rect.top)/rect.height)*100));
     el.style.left = positions[field].x + "%";
     el.style.top = positions[field].y + "%";
+    if (field === "Item Name") updateTitleFit();
   }
   el.addEventListener("pointerdown", e => {
     dragging = true;
