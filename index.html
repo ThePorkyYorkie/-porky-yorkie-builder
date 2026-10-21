@@ -96,6 +96,8 @@ button.warn {
   font-family:Arial, sans-serif;
   text-align:center;
   white-space:nowrap;
+  -webkit-text-size-adjust:none;
+  text-size-adjust:none;
   padding:2px 4px;
 }
 .calibrate .overlay {
@@ -325,7 +327,7 @@ function renderOverlay() {
     div.style.left = pos.x + "%";
     div.style.top = pos.y + "%";
     const previewSize = previewWrap.clientWidth * (fieldFontSize(field, pos)/1254);
-    div.style.fontSize = (isMeasurementField(field) ? previewSize : Math.max(12, previewSize)) + "px";
+    div.style.fontSize = previewSize + "px";
     div.style.opacity = val ? "1" : ".55";
     if (calibrate) makeDraggable(div, field);
     overlayLayer.appendChild(div);
