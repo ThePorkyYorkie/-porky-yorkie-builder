@@ -10,8 +10,12 @@ Inspect current main and this guide before editing. Do not rebuild from an old c
 
 The app currently has 29 templates. index.html contains template definitions, fields, preview, calibration, title counter and export. branding.js contains the exact approved user-provided Yorkie logo and per-template LOGO_AREAS. BRANDING.md documents branding. Use the exact approved badge, never a generated substitute.
 
-## Device-only settings
-Saved positions, measurement sizes and custom uploaded masters are in the user's browser localStorage, not GitHub. This checkpoint cannot back up the user's iPhone data. Preserve STORAGE_PREFIX porkyYorkieBuilderV3_ and existing template keys and storageKey suffixes. Do not clear storage, rename keys or replace saved positions. A new browser, domain, or cleared website data can lose these settings.
+## Shared calibration and device settings
+On October 21, 2026 the user exported the iPad's complete calibration: 29 templates, 175 fields, all saved. The original data is archived at layout-backups/ipad-2026-10-21.json. SHARED_LAYOUTS in index.html publishes those exact positions and numberSize values as shared defaults. Revision: ipad-2026-10-21T22:53:00.579Z.
+
+Every existing or fresh device adopts the published layout on reading it, while old localStorage entries remain untouched. Local position and numberSize overrides apply only when their separate positionsRevision or numberSizeRevision matches SHARED_LAYOUTS.revision. This prevents old phone defaults from overriding the published iPad layout. New edits are still device-local until the user exports and the shared data is published again; this is NOT automatic cloud synchronization. Never claim otherwise.
+
+Preserve STORAGE_PREFIX porkyYorkieBuilderV3_ and existing template keys/storageKey suffixes. Do not clear storage, rename keys, or destructively migrate positions. Custom uploaded masters and any later unpublished adjustments remain device-only.
 
 Preserve existing coordinates and sizes when adding a missing field; merge only absent fields. Three-piece suit includes Vest Waist between Vest Pit to Pit and Vest Length. Two-piece suit includes Thigh Across between Rise and Inseam. The user spent hours calibrating existing templates.
 
@@ -37,4 +41,7 @@ Export Finished PNG flattens the guide plus entered text into a square PNG, then
 ## Known status
 User confirmed the title-space counter works as desired. Dropdown is alphabetically sorted. Measurement-size slider currently remains visible; showing it only in Position Adjust Mode was requested earlier but deferred. Do not treat that as completed or change it without renewed scope.
 
-The stable branch preserves application code and repository assets, not device-only calibration. This documentation change does not change application behavior.
+The original stable branch preserves the pre-calibration application. backup/before-shared-ipad-layouts preserves the app immediately before publishing the iPad calibration. The archived iPad JSON now preserves today's calibration in GitHub too.
+
+## Publishing future layout changes
+Use Back Up All Layouts on the device with the correct adjustments. Validate that all required fields and number sizes are present, archive the supplied backup, replace SHARED_LAYOUTS data, and change its revision. Do not modify artwork, title counters, Photos export, or unrelated field definitions. Verify adoption with fresh storage, stale settings, and the originating device. Verify subsequent revision-marked local edits persist and that export uses the same positions and sizes. Uploading an image alone does not publish new calibration.
