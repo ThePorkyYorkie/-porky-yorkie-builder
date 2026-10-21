@@ -545,5 +545,126 @@ initDropdown();
 templateSelect.value = currentKey;
 render();
 </script>
+
+<script>
+// Read-only layout transfer: never changes localStorage or the active guide.
+function collectLayoutBackup() {
+  const templates = {};
+  let savedCount = 0;
+  for (const [key, template] of Object.entries(TEMPLATES)) {
+    const rawPositions = localStorage.getItem(storageKey(key, "positions"));
+    const rawScale = localStorage.getItem(storageKey(key, "numberSize"));
+    const customMaster = localStorage.getItem(storageKey(key, "image"));
+    if (rawPositions) savedCount++;
+    const storedScale = Number(rawScale);
+    const scale = key === currentKey ? measurementSizeScale :
+      (Number.isFinite(storedScale) && storedScale >= 0.5 && storedScale <= 2.5 ? storedScale : 1);
+    const layout = JSON.parse(JSON.stringify(key === currentKey ? positions : getPositions(key)));
+    for (const field of template.fields) {
+      const p = layout[field];
+      if (!p || ![p.x, p.y, p.size].every(Number.isFinite) || p.size <= 0) {
+        throw new Error("Please stop and tell us: the saved layout for " + template.label + " could not be read. Nothing has been changed.");
+      }
+    }
+    templates[key] = {
+      label: template.label,
+      positions: layout,
+      numberSize: scale,
+      savedOnThisDevice: !!rawPositions,
+      includesCurrentAdjustments: key === currentKey
+    };
+    if (customMaster) templates[key].customMaster = customMaster;
+  }
+  return {
+    format: "porky-yorkie-layout-backup",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    templateCount: Object.keys(templates).length,
+    savedTemplateCount: savedCount,
+    templates
+  };
+}
+
+(() => {
+  const button = document.createElement("button");
+  button.id = "backupLayoutsBtn";
+  button.type = "button";
+  button.className = "secondary";
+  button.textContent = "Back Up All Layouts";
+  const note = document.createElement("p");
+  note.className = "small";
+  note.textContent = "Copy or save all saved positions and sizes from this device for transfer. This does not sync them automatically.";
+  clearBtn.after(button, note);
+
+  const dialog = document.createElement("dialog");
+  dialog.id = "layoutBackupDialog";
+  dialog.setAttribute("aria-labelledby", "layoutBackupTitle");
+  dialog.style.cssText = "box-sizing:border-box;width:min(94vw,700px);max-height:92vh;overflow:auto;border:1px solid #d8d0c4;border-radius:14px;padding:16px;background:#f7f1e7";
+  dialog.innerHTML = '<button type="button" id="closeLayoutBackup" class="secondary">Back to Builder</button>' +
+    '<h2 id="layoutBackupTitle">Back Up All Layouts</h2>' +
+    '<p id="layoutBackupSummary" role="status" style="line-height:1.45"></p>' +
+    '<p>Tap Copy All Settings, return to this chat, and paste them into your message. You can also save the backup file and attach it here.</p>' +
+    '<button type="button" id="copyLayoutBackup">Copy All Settings</button>' +
+    '<button type="button" id="shareLayoutBackup" class="hidden">Share Backup File</button>' +
+    '<a id="downloadLayoutBackup" style="display:block;margin:16px 0" download>Save Backup File</a>' +
+    '<label for="layoutBackupText">Your layout backup</label>' +
+    '<textarea id="layoutBackupText" readonly spellcheck="false" style="box-sizing:border-box;width:100%;height:120px;font-size:16px"></textarea>' +
+    '<p id="layoutBackupStatus" role="status"></p>';
+  document.body.appendChild(dialog);
+  const text = document.getElementById("layoutBackupText");
+  const status = document.getElementById("layoutBackupStatus");
+  const share = document.getElementById("shareLayoutBackup");
+  let file = null;
+  let downloadUrl = null;
+
+  button.addEventListener("click", () => {
+    try {
+      const backup = collectLayoutBackup();
+      text.value = JSON.stringify(backup);
+      status.textContent = "";
+      const customCount = Object.values(backup.templates).filter(t => t.customMaster).length;
+      document.getElementById("layoutBackupSummary").textContent =
+        backup.templateCount + " templates included. " + backup.savedTemplateCount +
+        " have saved positions on this device. Current on-screen adjustments are included too." +
+        (customCount ? " " + customCount + " custom master images included; saving the file is best." : "") +
+        " Nothing on this device has been changed.";
+      const blob = new Blob([text.value], {type:"application/json"});
+      const filename = "porky-yorkie-layouts-" + new Date().toISOString().slice(0,10) + ".json";
+      file = typeof File === "function" ? new File([blob], filename, {type:"application/json"}) : null;
+      if (downloadUrl) URL.revokeObjectURL(downloadUrl);
+      downloadUrl = URL.createObjectURL(blob);
+      const download = document.getElementById("downloadLayoutBackup");
+      download.href = downloadUrl;
+      download.download = filename;
+      let canShare = false;
+      try { canShare = !!(file && navigator.share && navigator.canShare && navigator.canShare({files:[file]})); } catch (_) {}
+      share.classList.toggle("hidden", !canShare);
+      if (!dialog.open) dialog.showModal();
+    } catch (error) {
+      alert(error.message || "The backup could not be read. Your settings have not been changed.");
+    }
+  });
+  document.getElementById("closeLayoutBackup").addEventListener("click", () => dialog.close());
+  document.getElementById("copyLayoutBackup").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(text.value);
+      status.textContent = "Copied. Return to this chat and paste into a message.";
+    } catch (_) {
+      text.focus();
+      text.select();
+      text.setSelectionRange(0, text.value.length);
+      let copied = false;
+      try { copied = document.execCommand("copy"); } catch (_) {}
+      status.textContent = copied ? "Copied. Return to this chat and paste into a message." :
+        "Press and hold the selected settings and choose Copy, or use Save Backup File and attach the file here.";
+    }
+  });
+  share.addEventListener("click", async () => {
+    try { await navigator.share({files:[file], title:"Porky Yorkie layout backup"}); }
+    catch (error) { if (error.name !== "AbortError") status.textContent = "Use Save Backup File or Copy All Settings instead."; }
+  });
+})();
+</script>
+
 </body>
 </html>
