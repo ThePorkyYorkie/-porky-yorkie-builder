@@ -126,6 +126,10 @@ button.warn {
 
   <div id="fields"></div>
 
+  <label for="numberSize">Measurement Number Size: <output id="numberSizeValue" for="numberSize">100%</output></label>
+  <input type="range" id="numberSize" min="50" max="250" step="5" value="100">
+  <p class="small">Slide to resize measurement numbers. Saved for each template on this device.</p>
+
   <button id="exportBtn">Export Finished PNG</button>
   <button id="calibrateBtn" class="secondary">Turn On Position Adjust Mode</button>
   <button id="savePositionsBtn" class="secondary hidden">Save Text Positions</button>
@@ -152,6 +156,7 @@ let currentKey = Object.keys(TEMPLATES)[0];
 let values = {};
 let calibrate = false;
 let positions = {};
+let measurementSizeScale = 1;
 
 const templateSelect = document.getElementById("templateSelect");
 const imageUpload = document.getElementById("imageUpload");
@@ -163,6 +168,32 @@ const exportBtn = document.getElementById("exportBtn");
 const clearBtn = document.getElementById("clearBtn");
 const calibrateBtn = document.getElementById("calibrateBtn");
 const savePositionsBtn = document.getElementById("savePositionsBtn");
+const numberSize = document.getElementById("numberSize");
+const numberSizeValue = document.getElementById("numberSizeValue");
+
+function isMeasurementField(field) {
+  return field !== "Item Name" && field !== "Tagged Size";
+}
+
+function fieldFontSize(field, pos) {
+  return pos.size * (isMeasurementField(field) ? measurementSizeScale : 1);
+}
+
+function loadNumberSize() {
+  const saved = Number(localStorage.getItem(storageKey(currentKey, "numberSize")));
+  measurementSizeScale = Number.isFinite(saved) && saved >= 0.5 && saved <= 2.5 ? saved : 1;
+  const percent = Math.round(measurementSizeScale * 100);
+  numberSize.value = String(percent);
+  numberSizeValue.textContent = percent + "%";
+}
+
+numberSize.addEventListener("input", () => {
+  measurementSizeScale = Number(numberSize.value) / 100;
+  numberSizeValue.textContent = numberSize.value + "%";
+  try { localStorage.setItem(storageKey(currentKey, "numberSize"), String(measurementSizeScale)); }
+  catch (error) { /* Size still works when this browser cannot save preferences. */ }
+  renderOverlay();
+});
 
 function initDropdown() {
   Object.entries(TEMPLATES).sort((a, b) => a[1].label.localeCompare(b[1].label)).forEach(([key, t]) => {
@@ -204,6 +235,7 @@ async function render() {
   values = {};
   currentKey = templateSelect.value;
   positions = getPositions(currentKey);
+  loadNumberSize();
   const requestedKey = currentKey;
   templateImage.removeAttribute("src");
   exportBtn.disabled = true;
@@ -260,7 +292,8 @@ function renderOverlay() {
     div.textContent = val || field;
     div.style.left = pos.x + "%";
     div.style.top = pos.y + "%";
-    div.style.fontSize = Math.max(12, previewWrap.clientWidth * (pos.size/1254)) + "px";
+    const previewSize = previewWrap.clientWidth * (fieldFontSize(field, pos)/1254);
+    div.style.fontSize = (isMeasurementField(field) ? previewSize : Math.max(12, previewSize)) + "px";
     div.style.opacity = val ? "1" : ".55";
     if (calibrate) makeDraggable(div, field);
     overlayLayer.appendChild(div);
@@ -347,7 +380,7 @@ exportBtn.addEventListener("click", async () => {
       const pos = positions[field] || {x:50,y:50,size:28};
       const x = (pos.x/100) * canvas.width;
       const y = (pos.y/100) * canvas.height;
-      const size = Math.round(pos.size * (canvas.width / 1254));
+      const size = Math.round(fieldFontSize(field, pos) * (canvas.width / 1254));
       ctx.fillStyle = "#061b3a";
       ctx.font = "900 " + size + "px Arial, sans-serif";
       ctx.textAlign = "center";
