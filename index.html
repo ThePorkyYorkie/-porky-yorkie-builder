@@ -110,6 +110,22 @@ button.warn {
   gap:8px;
 }
 .hidden { display:none; }
+#finishedDialog {
+  box-sizing:border-box;
+  width:min(94vw,900px);
+  max-height:92vh;
+  overflow:auto;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
+  background:var(--cream);
+  color:#111;
+}
+#finishedDialog::backdrop { background:rgba(0,0,0,.65); }
+#finishedDialog h2 { margin:14px 0 8px; font-size:22px; }
+#finishedImage { display:block; width:100%; height:auto; margin-top:16px; -webkit-touch-callout:default; user-select:auto; }
+#finishedDialog p { line-height:1.45; }
+#shareImageBtn { margin-bottom:8px; }
 </style>
 </head>
 <body>
@@ -145,6 +161,13 @@ button.warn {
 </section>
 </div>
 </main>
+<dialog id="finishedDialog" aria-labelledby="finishedTitle">
+  <button id="closeFinishedBtn" class="secondary" type="button">Back to Builder</button>
+  <h2 id="finishedTitle">Your Finished Measurement Image</h2>
+  <p id="finishedInstructions">To save to Photos, press and hold the finished image below, then choose Save to Photos or Save Image.</p>
+  <button id="shareImageBtn" class="hidden" type="button">Share / Save Image</button>
+  <img id="finishedImage" alt="Finished measurement guide with your item information and measurements">
+</dialog>
 
 <script src="branding.js?v=full-guide-dimensions-2"></script>
 <script>
@@ -367,29 +390,56 @@ calibrateBtn.addEventListener("click", () => {
 
 savePositionsBtn.addEventListener("click", savePositions);
 
-exportBtn.addEventListener("click", async () => {
-  let src;
-  try { src = await getBrandedTemplateImage(currentKey); }
-  catch (error) { alert(error.message); return; }
-  if (!src) {
-    alert("Upload the master image for this template first.");
-    return;
+const finishedDialog = document.getElementById("finishedDialog");
+const finishedImage = document.getElementById("finishedImage");
+const shareImageBtn = document.getElementById("shareImageBtn");
+const finishedInstructions = document.getElementById("finishedInstructions");
+let finishedImageFile = null;
+const photoSaveInstructions = "To save to Photos, press and hold the finished image below, then choose Save to Photos or Save Image.";
+
+document.getElementById("closeFinishedBtn").addEventListener("click", () => finishedDialog.close());
+finishedDialog.addEventListener("close", () => {
+  finishedImageFile = null;
+  finishedImage.removeAttribute("src");
+});
+
+// This separate tap keeps iPhone sharing inside a direct user gesture.
+shareImageBtn.addEventListener("click", async () => {
+  if (!finishedImageFile) return;
+  try {
+    await navigator.share({files:[finishedImageFile]});
+  } catch (error) {
+    if (error.name !== "AbortError") finishedInstructions.textContent = photoSaveInstructions;
   }
-  const img = new Image();
-  img.onload = () => {
+});
+
+exportBtn.addEventListener("click", async () => {
+  const selectedKey = currentKey;
+  const savedValues = {...values};
+  const savedPositions = Object.fromEntries(Object.entries(positions).map(([field,pos]) => [field,{...pos}]));
+  const savedSizeScale = measurementSizeScale;
+  const previousLabel = exportBtn.textContent;
+  exportBtn.disabled = true;
+  exportBtn.textContent = "Preparing Finished Image…";
+  try {
+    const src = await getBrandedTemplateImage(selectedKey);
+    if (!src) throw new Error("Upload the master image for this template first.");
+    const img = await loadBrandImage(src);
     const canvas = document.createElement("canvas");
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
     const ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0);
+    if (!ctx) throw new Error("Could not prepare the finished image. Please try again.");
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    TEMPLATES[currentKey].fields.forEach(field => {
-      const val = formatValue(field, values[field] || "");
+    TEMPLATES[selectedKey].fields.forEach(field => {
+      const val = formatValue(field, savedValues[field] || "");
       if (!val) return;
-      const pos = positions[field] || {x:50,y:50,size:28};
+      const pos = savedPositions[field] || {x:50,y:50,size:28};
       const x = (pos.x/100) * canvas.width;
       const y = (pos.y/100) * canvas.height;
-      const size = Math.round(fieldFontSize(field, pos) * (canvas.width / 1254));
+      const fieldSize = pos.size * (isMeasurementField(field) ? savedSizeScale : 1);
+      const size = Math.round(fieldSize * (canvas.width / 1254));
       ctx.fillStyle = "#061b3a";
       ctx.font = "900 " + size + "px Arial, sans-serif";
       ctx.textAlign = "center";
@@ -397,15 +447,27 @@ exportBtn.addEventListener("click", async () => {
       ctx.fillText(val, x, y);
     });
 
-    const a = document.createElement("a");
-    const item = (values["Item Name"] || TEMPLATES[currentKey].label || "measurement-guide")
-      .replace(/[^a-z0-9]+/gi, "-")
-      .replace(/^-|-$/g, "");
-    a.download = item + ".png";
-    a.href = canvas.toDataURL("image/png");
-    a.click();
-  };
-  img.src = src;
+    // The visible image itself now contains every entered value.
+    finishedImage.src = canvas.toDataURL("image/png");
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+    const item = (savedValues["Item Name"] || TEMPLATES[selectedKey].label || "measurement-guide")
+      .replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "measurement-guide";
+    finishedImageFile = blob && typeof File !== "undefined" ? new File([blob], item + ".png", {type:"image/png"}) : null;
+    let canShareImage = false;
+    try {
+      canShareImage = !!(finishedImageFile && navigator.share && navigator.canShare && navigator.canShare({files:[finishedImageFile]}));
+    } catch (error) { /* The finished image still supports press-and-hold saving. */ }
+    shareImageBtn.classList.toggle("hidden", !canShareImage);
+    finishedInstructions.textContent = canShareImage
+      ? "Tap Share / Save Image, then choose Save Image to add it to Photos. You can also press and hold the finished image below and choose Save to Photos."
+      : photoSaveInstructions;
+    if (!finishedDialog.open) finishedDialog.showModal();
+  } catch (error) {
+    alert(error.message || "Could not prepare the finished image. Please try again.");
+  } finally {
+    exportBtn.textContent = previousLabel;
+    exportBtn.disabled = false;
+  }
 });
 
 initDropdown();
