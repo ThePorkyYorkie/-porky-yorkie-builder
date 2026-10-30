@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1248 1248" width="1248" height="1248">
+<rect width="1248" height="1248" fill="#fcf9f0"/>
+<g font-family="Arial,Helvetica,sans-serif" fill="#071e46">
+<text x="628" y="109" font-size="106" font-weight="900" text-anchor="middle" letter-spacing="3">LONG COAT</text><text x="622" y="170" font-size="53" font-weight="900" text-anchor="middle">MEASUREMENT GUIDE</text>
+<path d="M300 158h105m443 0h105" stroke="#061c45" stroke-width="5"/>
+<rect x="967" y="18" width="260" height="171" rx="8" fill="#071d3c"/><rect x="977" y="28" width="240" height="151" rx="3" fill="none" stroke="#fff" stroke-width="2"/>
+<g fill="white" text-anchor="middle"><text x="1096" y="64" font-size="27" font-weight="bold">THE PORKY YORKIE</text><text x="1096" y="102" font-size="25" font-style="italic">Curated Finds,</text><text x="1096" y="131" font-size="25" font-style="italic">Vintage &amp; Beyond,</text><text x="1096" y="164" font-size="24">──── ★ ────</text></g>
+<rect x="294" y="197" width="936" height="115" rx="12" fill="none" stroke="#204abb" stroke-width="2"/>
+<path d="M294 250h936" stroke="#204abb" stroke-width="2"/>
+<text x="314" y="233" font-size="31" font-weight="900">ITEM NAME:</text><path d="M468 240h738" stroke="#3159bd" stroke-width="2"/>
+<text x="314" y="292" font-size="31" font-weight="900">TAGGED SIZE:</text><path d="M480 299h208" stroke="#3159bd" stroke-width="2"/>
+<text x="730" y="291" font-size="20">★</text><text x="768" y="278" font-size="17">For best fit, please compare the measurements</text><text x="768" y="298" font-size="17">below to a similar garment you own.</text>
+</g>
+<!-- neutral technical coat outlines, not photos -->
+<g stroke="#151b21" stroke-width="3" fill="#f8f7f2" stroke-linejoin="round">
+<path d="M472 321L441 347L381 367L344 486L302 690L367 705L398 539L390 845Q484 869 635 848L630 537L671 706L735 690L694 485L650 370L587 347L557 320Z"/>
+<path d="M472 321L518 363L496 392L536 467L503 841L390 845L398 538L367 705L302 690L344 486L381 367L441 347Z" fill="#fbf9f3"/>
+<path d="M557 320L518 363L537 392L498 466L503 841L635 848L630 537L671 706L735 690L694 485L650 370L587 347Z" fill="#fbf9f3"/>
+<path d="M472 321L498 330L517 361L495 396L530 448L500 472L468 367L444 395L477 423L459 442L421 368Z" fill="#faf9f4"/>
+<path d="M557 320L535 330L517 361L538 396L507 448L500 472L568 367L594 395L562 423L580 442L615 368Z" fill="#faf9f4"/>
+<path d="M502 472L503 839" fill="none"/><path d="M390 845Q501 866 635 848" fill="none"/><path d="M424 613l-5 35h41l6-31zm137 0l6 35h42l-5-35z"/>
+<circle cx="520" cy="528" r="7"/><circle cx="520" cy="606" r="7"/><circle cx="520" cy="684" r="7"/>
+<path d="M389 365L371 484L366 697M649 369l18 117l5 209" fill="none" stroke="#aaa" stroke-width="1.2"/>
+<!-- back view -->
+<path d="M824 320l-31 27l-56 22l-42 118l-40 208l61 12l45-161l-2 298q114 42 229 0l-3-298l45 161l61-12l-43-208l-42-118l-55-22l-31-27Z" />
+<path d="M824 320q61 35 127 0M870 340v509M758 844q113 44 230 0" fill="none"/>
+</g>
+<!-- blue measurement arrow system -->
+<g stroke="#1656ef" stroke-width="4" fill="none">
+<path d="M385 371H641"/><path d="M400 500H627"/><path d="M980 390Q1024 522 1074 660"/><path d="M866 344V847"/>
+</g>
+<g fill="#1656ef"><path d="M385 371l15-9v18zM641 371l-15-9v18zM400 500l15-9v18zM627 500l-15-9v18zM980 390l-4 22 18-12zM1074 660l-17-11 18-8zM866 344l-10 19h20zM866 847l-10-19h20z"/></g>
+<g fill="#11151b"><circle cx="385" cy="371" r="6"/><circle cx="641" cy="371" r="6"/><circle cx="400" cy="500" r="6"/><circle cx="627" cy="500" r="6"/><circle cx="980" cy="390" r="6"/><circle cx="1074" cy="660" r="6"/></g>
+<g font-family="Arial,Helvetica,sans-serif" fill="#07318a">
+<g font-size="29" font-weight="900"><text x="67" y="354">SHOULDER</text><text x="67" y="519">PIT TO PIT</text><text x="1039" y="363" font-size="27">SLEEVE LENGTH</text><text x="1037" y="710">LENGTH</text></g>
+<g font-size="20"><text x="67" y="382">Measure straight across</text><text x="67" y="408">the back from shoulder</text><text x="67" y="434">seam to shoulder seam.</text>
+<text x="67" y="551">Measure straight across</text><text x="67" y="577">the chest from armpit</text><text x="67" y="603">seam to armpit seam.</text>
+<text x="1039" y="393">Measure from the point</text><text x="1039" y="419">where the shoulder seam</text><text x="1039" y="445">meets the sleeve seam</text><text x="1039" y="471">down to the end of the</text><text x="1039" y="497">sleeve cuff.</text>
+<text x="1037" y="740">Measure from the highest</text><text x="1037" y="766">point of the shoulder</text><text x="1037" y="792">straight to bottom hem.</text></g>
+<g stroke="#1656ef" stroke-width="2"><path d="M74 475h133M74 662h133M1037 555h132M1037 847h132M213 348l111 0l62 23M214 520h107l79-20M980 390l47-26M866 676h158"/></g>
+<g fill="#071e46" font-size="23" font-weight="bold"><text x="222" y="481">in.</text><text x="222" y="668">in.</text><text x="1180" y="561">in.</text><text x="1180" y="853">in.</text></g>
+</g>
+<!-- bottom how-to and notes -->
+<rect x="30" y="896" width="955" height="241" rx="12" fill="none" stroke="#2145a9" stroke-width="2"/>
+<rect x="1020" y="896" width="205" height="241" rx="12" fill="none" stroke="#2145a9" stroke-width="2"/>
+<rect x="56" y="877" width="200" height="39" rx="7" fill="#071d3c"/><text x="156" y="903" fill="white" font-family="Arial" font-size="21" text-anchor="middle">HOW TO MEASURE</text>
+<g stroke="#3154ad" stroke-width="1.5"><path d="M272 911v218M512 911v218M753 911v218"/></g>
+<g fill="#071e46" font-family="Arial,Helvetica,sans-serif" text-anchor="middle">
+<g font-size="22" font-weight="bold"><text x="152" y="938">PIT TO PIT</text><text x="390" y="938">SHOULDER</text><text x="633" y="938">SLEEVE LENGTH</text><text x="870" y="938">LENGTH</text></g>
+<g font-size="16"><text x="152" y="970">Across chest from</text><text x="152" y="993">armpit to armpit</text><text x="390" y="970">Across back from</text><text x="390" y="993">shoulder seam to seam</text><text x="633" y="970">Shoulder seam to</text><text x="633" y="993">end of sleeve cuff</text><text x="870" y="970">Highest shoulder point</text><text x="870" y="993">to bottom hem</text></g></g>
+<g stroke="#131d2b" stroke-width="2" fill="none"><path d="M105 1045l26-13l25 12l25-12l24 13l11 67h-108zM346 1045l25-13l24 12l25-12l25 13l11 67h-118zM603 1045l25-13l24 12l25-12l24 13l12 67H593zM824 1045l26-13l24 12l25-12l25 13l11 67H812z"/></g>
+<g stroke="#1656ef" stroke-width="4" fill="none"><path d="M124 1074h68M361 1057h68M671 1047l43 61M873 1046v65"/></g>
+<rect x="1050" y="906" width="148" height="34" rx="7" fill="#071d3c"/><text x="1124" y="930" text-anchor="middle" font-size="22" font-family="Arial" fill="white">NOTES</text>
+<g font-family="Arial" fill="#071e46" font-size="16"><text x="1044" y="965">• Measurements are</text><text x="1058" y="987">taken laid flat.</text><text x="1044" y="1021">• All measurements</text><text x="1058" y="1043">are in inches.</text><text x="1044" y="1078">• Allow for ±1/2&quot;</text><text x="1058" y="1100">variance.</text></g>
+<rect x="0" y="1143" width="1248" height="72" fill="#071d3c"/>
+<g fill="#fff" font-family="Arial"><text x="54" y="1173" font-size="16">QUALITY FINDS.</text><text x="54" y="1196" font-size="16">HONEST MEASUREMENTS.</text><text x="625" y="1195" text-anchor="middle" font-size="45" font-weight="900">★ THE PORKY YORKIE ★</text><text x="1037" y="1172" font-size="14">MEASURED BY HAND.</text><text x="1037" y="1194" font-size="14">LISTED WITH CARE.</text></g>
+<text x="624" y="1239" fill="#071e46" text-anchor="middle" letter-spacing="3" font-size="17" font-family="Arial">All measurements are in inches.</text>
+</svg>
