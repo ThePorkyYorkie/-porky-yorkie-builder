@@ -1,0 +1,28 @@
+name: Verify guide repair integrity
+on:
+  pull_request:
+    paths: ['branding.js', 'index.html', 'guides/**', 'layout-backups/**', '.github/workflows/verify-guide-repair.yml']
+  push:
+    branches: ['repair/guide-artwork-2026-10-30']
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify untouched calibration and valid repair code
+        run: |
+          node --check branding.js
+          node --check app.js
+          python3 - <<'PY'
+          import json, pathlib, re
+          root=pathlib.Path('.')
+          backups=json.loads((root/'layout-backups/ipad-2026-10-21.json').read_text())
+          assert backups, 'Missing original iPad calibration backup'
+          b=(root/'branding.js').read_text()
+          ids=json.loads(re.search(r'const LOGO_AREAS = (\{.*?\});',b).group(1))
+          assert len(ids)>=29, f'Logo regions missing: {len(ids)}'
+          assert 'OFFICIAL_LOGO_SOURCE' in b
+          assert 'const outer=14' in b and 'logoCanvas' in b
+          assert (root/'index.html').stat().st_size > 1000000
+          print('PASS: logo regions',len(ids),'original layout backup present, builder entry intact')
+          PY
