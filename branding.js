@@ -24,26 +24,58 @@ document.addEventListener("DOMContentLoaded", function () {
     const ya=Math.max(0,Math.floor(raw[1]*scaleY)-3);
     const xb=Math.min(W,Math.ceil(raw[2]*scaleX)+4);
     const yb=Math.min(H,Math.ceil(raw[3]*scaleY)+4);
-    const pixel=ctx.getImageData(0,0,W,H).data;
-    for(let yy=ya; yy<yb; yy++){
-       const rr=[],gg=[],bb=[];
-       for(let n=0;n<90;n++){
-         const xx=Math.min(W-1,Math.floor(xb+9+(W-xb-20)*n/89));
-         const o=(yy*W+xx)*4;
-         const r=pixel[o],g=pixel[o+1],b=pixel[o+2];
-         if(r>216&&g>207&&b>192&&Math.max(r,g,b)-Math.min(r,g,b)<38){
-           rr.push(r);gg.push(g);bb.push(b);
-         }
-       }
-       const med=(arr,v)=>{if(!arr.length)return v;arr.sort((a,b)=>a-b);return arr[Math.floor(arr.length/2)]};
-       ctx.fillStyle="rgb("+med(rr,249)+","+med(gg,244)+","+med(bb,236)+")";
-       ctx.fillRect(xa,yy,xb-xa,1);
+    // Rebuild the underlying paper from neighboring pixels, not flat horizontal stripes.
+    // The outer feather blends smoothly back into the untouched original guide.
+    const before=ctx.getImageData(0,0,W,H);
+    const srcPixels=before.data;
+    const sampled=(x,y,c)=>{
+      const ix=Math.max(0,Math.min(W-1,Math.round(x)));
+      const iy=Math.max(0,Math.min(H-1,Math.round(y)));
+      return srcPixels[(iy*W+ix)*4+c];
+    };
+    const outer=14;
+    const left=Math.max(0,xa-outer),right=Math.min(W-1,xb+outer);
+    const top=Math.max(0,ya-outer),bottom=Math.min(H-1,yb+outer);
+    const out=ctx.createImageData(right-left+1,bottom-top+1);
+    for(let y=top;y<=bottom;y++){
+      const vy=(y-top)/Math.max(1,bottom-top);
+      for(let x=left;x<=right;x++){
+        const vx=(x-left)/Math.max(1,right-left);
+        const edgeDist=Math.min(x-xa,xb-1-x,y-ya,yb-1-y);
+        const opacity=Math.max(0,Math.min(1,(edgeDist+outer)/outer));
+        for(let c=0;c<3;c++){
+          // Blend both horizontal and vertical edge reconstructions to
+          // retain gentle paper variations rather than hard uniform bands.
+          const horiz=sampled(left,y,c)*(1-vx)+sampled(right,y,c)*vx;
+          const vert=sampled(x,top,c)*(1-vy)+sampled(x,bottom,c)*vy;
+          const reconstructed=(horiz+vert)/2;
+          const original=sampled(x,y,c);
+          out.data[((y-top)*(right-left+1)+(x-left))*4+c]=Math.round(original*(1-opacity)+reconstructed*opacity);
+        }
+        out.data[((y-top)*(right-left+1)+(x-left))*4+3]=255;
+      }
     }
+    ctx.putImageData(out,left,top);
     const width=xb-xa,height=yb-ya;
-    const size=Math.round(Math.min(width*.83,height*.86));
+    const size=Math.round(Math.min(width*.79,height*.82));
     const logoX=xa+Math.round((width-size)/2);
     const logoY=ya+Math.round((height-size)/2);
-    ctx.drawImage(logo,logoX,logoY,size,size);
+    // Feather the square JPEG's outer pixels so its cream background doesn't
+    // create another visible hard-edged box over the guide's paper.
+    const logoCanvas=document.createElement("canvas");
+    logoCanvas.width=size; logoCanvas.height=size;
+    const lc=logoCanvas.getContext("2d",{willReadFrequently:true});
+    lc.drawImage(logo,0,0,size,size);
+    const logoData=lc.getImageData(0,0,size,size);
+    const lp=logoData.data;
+    const feather=Math.max(8,Math.round(size*.095));
+    for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+      const dist=Math.min(x,y,size-1-x,size-1-y);
+      const t=Math.max(0,Math.min(1,dist/feather));
+      lp[(y*size+x)*4+3]=Math.round(255*t*t*(3-2*t));
+    }
+    lc.putImageData(logoData,0,0);
+    ctx.drawImage(logoCanvas,logoX,logoY);
     return canvas.toDataURL("image/png");
   };
   const select=document.querySelector("select");
