@@ -1,0 +1,193 @@
+index size 5635368
+=== baseball_jersey @ 1142642 ===
+{"label": "Sleeveless Shirt", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"], "embedded": "guides/sleeveless_shirt.svg"}, "basketball_jersey": {"label": "Basketball Jersey", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"], "embedded": "guides/basketball_jersey.svg"}, "baseball_jersey": {"label": "Baseball Jersey", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"], "embedded": "guides/baseball_jersey.svg"}, "football_jersey": {"label": "Football Jersey", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"], "embedded": "guides/football_jersey.svg"}, "button_up_short_sleeve": {"label": "Short Sleeve Button-Up Shirt", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length", "Shoulder"], "embedded": "guides/button_up_short_sleeve.svg?v=lower-shoulder-final-20261028"}, "button_up_long_sleeve": {"label": "Long Sleeve Button-Up Shirt", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length", "Shoulder"], "embedded": "guides/button_up_long_sleeve.svg?v=approved-original-20261028"}, "shorts": {"label": "Shorts", "fields": ["Item Name", "Tagged Size", "Waist", "Rise", "Inseam", "Length", "Leg Opening"], "embedded": "guides/shorts.svg"}, "jeans": {"label": "Pants", "fields": ["Item Name", "Tagged Size", "Waist", "Rise", "Thigh", "Inseam", "Outseam", "Leg Opening"], "embedde
+=== baseball_jersey @ 1142773 ===
+svg"}, "basketball_jersey": {"label": "Basketball Jersey", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"], "embedded": "guides/basketball_jersey.svg"}, "baseball_jersey": {"label": "Baseball Jersey", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length"], "embedded": "guides/baseball_jersey.svg"}, "football_jersey": {"label": "Football Jersey", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length"], "embedded": "guides/football_jersey.svg"}, "button_up_short_sleeve": {"label": "Short Sleeve Button-Up Shirt", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length", "Shoulder"], "embedded": "guides/button_up_short_sleeve.svg?v=lower-shoulder-final-20261028"}, "button_up_long_sleeve": {"label": "Long Sleeve Button-Up Shirt", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Length", "Sleeve Length", "Shoulder"], "embedded": "guides/button_up_long_sleeve.svg?v=approved-original-20261028"}, "shorts": {"label": "Shorts", "fields": ["Item Name", "Tagged Size", "Waist", "Rise", "Inseam", "Length", "Leg Opening"], "embedded": "guides/shorts.svg"}, "jeans": {"label": "Pants", "fields": ["Item Name", "Tagged Size", "Waist", "Rise", "Thigh", "Inseam", "Outseam", "Leg Opening"], "embedded": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAw
+=== baseball_jersey @ 2549772 ===
+ions":{"Item Name":{"x":67.32623538250729,"y":20.1370604315562,"size":24},"Tagged Size":{"x":40.79295678635469,"y":24.61150740265616,"size":24},"Pit to Pit":{"x":26.465798063815942,"y":60.68267423075145,"size":34},"Length":{"x":72.49422623701645,"y":61.44017845292604,"size":34}},"numberSize":0.75},"baseball_jersey":{"positions":{"Item Name":{"x":67.38695878828615,"y":20.506197632310982,"size":24},"Tagged Size":{"x":41.24823457576574,"y":25.236844627485343,"size":24},"Pit to Pit":{"x":22.51261646036646,"y":62.13766052453566,"size":34},"Length":{"x":77.85716797089543,"y":63.69081716224863,"size":34}},"numberSize":0.75},"football_jersey":{"positions":{"Item Name":{"x":68.11444813992514,"y":19.16753522018107,"size":24},"Tagged Size":{"x":41.146031789728795,"y":23.807777060704705,"size":24},"Pit to Pit":{"x":8.569652693299599,"y":53.31109616886658,"size":34},"Length":{"x":81.64997514697741,"y":68.06470974005737,"size":34},"Sleeve Length":{"x":81.83555115736237,"y":43.99590662735865,"size":32}},"numberSize":0.75},"button_up_long_sleeve":{"positions":{"Item Name":{"x":67.02346718526184,"y":24.67222629539807,"size":24},"Tagged Size":{"x":45.95234852789352,"y":28.285776104187537,"size":24},"Shoulder":{"x":8.539273871009396,"y":41.9153924355576,"size":30},"Pit to Pit":{"x":8.4860448393254,"y":56.60794830059198,"size":34},"Sleeve Length":{"x":81.81642798801958,"y":45.40918338503575,"size"
+=== baseball_jersey @ 5617298 ===
+"short_sleeve_tshirt": [39.8, 97], "long_sleeve_tshirt": [39.0, 97], "crewneck_sweatshirt": [39.0, 97], "crewneck_sweater": [39.4, 97], "hoodie": [38.5, 97], "polo": [39.5, 97], "long_sleeve_polo": [39.2, 97], "tank_top": [39.1, 97], "sleeveless_shirt": [39.7, 97], "basketball_jersey": [37.6, 97], "baseball_jersey": [38.5, 97], "football_jersey": [38.7, 97], "button_up_short_sleeve": [37.9, 97], "button_up_long_sleeve": [37.9, 97], "shorts": [39.6, 97], "jeans": [39.5, 97], "bib_overalls": [38.8, 97], "blazer_sportcoat": [38.1, 97], "two_piece_suit": [38.9, 97], "three_piece_suit": [36.7, 97], "denim_jacket": [39.0, 97], "workwear_vest": [38.7, 97], "sweater_vest": [38.4, 97], "workwear_jacket": [38.8, 97], "lightweight_jackets": [39.0, 97], "long_coat": [37.7, 97]};
+const titleMeasureContext = document.createElement("canvas").getContext("2d");
+
+function measureTitleFit(text, key, pos, imageWidth) {
+  const characters = Array.from(text).length;
+  const [left, right] = TITLE_LINE_BOUNDS[key];
+  const halfWidth = Math.min(pos.x - left, right - pos.x);
+  const available = Math.max(0, halfWidth * 2 * imageWidth / 100);
+  const fontSize = Math.round(fieldFontSize("Item Name", pos) * imageWidth / 1254);
+  titleMeasureContext.font = "900 " + fontSize + "px Arial, sans-serif";
+  const metrics = titleMeasureContext.measureText(text);
+  const textWidth = Math.max(metrics.width, (metrics.
+=== function getBrandedTemplateImage @ 5612430 ===
+U2mxfJSYPjntAjS+eWJhoFuEhO+bP90ODZWq4pUCMtaPFVcp//uUf//ifv/wfpFoKWGDFq70AAAAASUVORK5CYII=";
+const OFFICIAL_LOGO_OVERLAYS = {
+  jeans: {x: 0.0, y: 0.0, w: 21.2, h: 21.2, pad: 1.0, background: "#f7f3ec"},
+  workwear_jacket: {x: 0.0, y: 0.0, w: 21.0, h: 21.0, pad: 1.1, background: "#f7f3ec"}
+};
+
+async function getBrandedTemplateImage(key) {
+  const src = getTemplateImage(key);
+  if (!src) return "";
+  const overlay = OFFICIAL_LOGO_OVERLAYS[key];
+  if (!overlay) return src;
+  const [baseImage, logoImage] = await Promise.all([loadBrandImage(src), loadBrandImage(OFFICIAL_PORKY_YORKIE_LOGO)]);
+  const canvas = document.createElement("canvas");
+  canvas.width = baseImage.naturalWidth || baseImage.width;
+  canvas.height = baseImage.naturalHeight || baseImage.height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Could not prepare the template image.");
+  ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height);
+  const x = Math.round(canvas.width * overlay.x / 100);
+  const y = Math.round(canvas.height * overlay.y / 100);
+  const w = Math.round(canvas.width * overlay.w / 100);
+  const h = Math.round(canvas.height * overlay.h / 100);
+  const pad = Math.max(0, Math.round(canvas.width * (overlay.pad || 0) / 100));
+  const fillX = Math.max(0, x - pad);
+  const fillY = Math.max(0, y - pad);
+  const fillW = Math.min(canvas.width - fillX, w + pad * 2);
+  const fillH = M
+=== TEMPLATES = @ 5089 ===
+r Save Image.</p>
+  <button id="shareImageBtn" class="hidden" type="button">Share / Save Image</button>
+  <img id="finishedImage" alt="Finished measurement guide with your item information and measurements">
+</dialog>
+
+<script src="branding.js?v=approved-button-up-20261028"></script>
+<script>
+const TEMPLATES = {"long_coat": {"label": "Long Coat", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Shoulder", "Sleeve Length", "Length"], "embedded": "guides/long_coat.png?v=20261030"}, "chore_jacket": {"label": "Chore Jacket", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Shoulder", "Sleeve Length", "Length"], "embedded": "./Chore_Jacket.png.png"}, "sweater": {"label": "Sweater", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Shoulder", "Sleeve Length", "Length"], "embedded": "./2F9C3857-20DA-4A80-A454-D4509D853ECC.png"}, "cardigan": {"label": "Cardigan", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Shoulder", "Sleeve Length", "Length"], "embedded": "./03DEC799-922B-4278-A912-94AB4B92A3B8.png"}, "hooded_jacket": {"label": "Hooded Jacket", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Shoulder", "Sleeve Length", "Length"], "embedded": "./D85A1D86-87A3-4C88-8FC5-115C053CA5F5.png"}, "bomber_jacket": {"label": "Bomber Jacket", "fields": ["Item Name", "Tagged Size", "Pit to Pit", "Shoulder", "Sleeve Length", "Length"], "embedded": "./D20EE804-FC3F-4A5A
+=== SHARED_LAYOUTS @ 2543830 ===
+ize": 28}, "Pant Waist": {"x": 72, "y": 42, "size": 28}, "Vest Pit to Pit": {"x": 50, "y": 42, "size": 28}, "Vest Length": {"x": 55, "y": 55, "size": 28}};
+const STORAGE_PREFIX = "porkyYorkieBuilderV3_";
+
+// Published iPad calibration; preserve local originals when adopting a shared revision.
+const SHARED_LAYOUTS = {"revision":"ipad-2026-10-30T21:09:15.746Z","templates":{"chore_jacket":{"positions":{"Item Name":{"x":67.33616735997644,"y":18.182865872633382,"size":24},"Tagged Size":{"x":40.02853139620952,"y":22.593789175924567,"size":24},"Pit to Pit":{"x":7.118182975703783,"y":48.57873180972824,"size":34},"Shoulder":{"x":80.2947155620659,"y":36.1254498151797,"size":30},"Sleeve Length":{"x":84.26176452166152,"y":53.82217307835724,"size":32},"Length":{"x":85.74246769571285,"y":69.4405480706155,"size":34}},"numberSize":0.7},"sweater":{"positions":{"Item Name":{"x":67.24300735116036,"y":18.141798416014858,"size":24},"Tagged Size":{"x":40.09713728076164,"y":22.700728974768424,"size":24},"Pit to Pit":{"x":7.083691945650565,"y":48.72613566528275,"size":34},"Shoulder":{"x":80.6074393522572,"y":36.29569807603153,"size":30},"Sleeve Length":{"x":84.73041891258323,"y":54.05037045298111,"size":32},"Length":{"x":85.94746537779953,"y":69.79507198791266,"size":34}},"numberSize":0.7},"cardigan":{"positions":{"Item Name":{"x":67.33616735997644,"y":18.182865872633382,"size":24},"Tagged Size":{"x":
+=== SHARED_LAYOUTS @ 2558287 ===
+476,"y":53.34203118392872,"size":34},"Shoulder":{"x":9.212581487855234,"y":36.371742044351635,"size":30},"Sleeve Length":{"x":87.9643511420615,"y":42.45261319820489,"size":32},"Length":{"x":86.68525041178962,"y":67.25745706292834,"size":34}},"numberSize":1}}};
+
+function sharedLayout(key) {
+  return SHARED_LAYOUTS.templates[key] || null;
+}
+
+function localLayoutIsCurrent(key, kind) {
+  return !sharedLayout(key) || localStorage.getItem(storageKey(key, kind + "Revision")) === SHARED_LAYOUTS.revision;
+}
+
+let currentKey = Object.keys(TEMPLATES)[0];
+let values = {};
+let calibrate = false;
+let positions = {};
+let measurementSizeScale = 1;
+
+const templateSelect = document.getElementById("templateSelect");
+const imageUpload = document.getElementById("imageUpload");
+const fieldsDiv = document.getElementById("fields");
+const templateImage = document.getElementById("templateImage");
+const overlayLayer = document.getElementById("overlayLayer");
+const previewWrap = document.getElementById("previewWrap");
+const exportBtn = document.getElementById("exportBtn");
+const clearBtn = document.getElementById("clearBtn");
+const calibrateBtn = document.getElementById("calibrateBtn");
+const savePositionsBtn = document.getElementById("savePositionsBtn");
+const numberSize = document.getElementById("numberSize");
+const numberSizeValue = document.getElementById("numberSizeValue");
+
+function isMeasurementFiel
+=== SHARED_LAYOUTS @ 2558464 ===
+Length":{"x":86.68525041178962,"y":67.25745706292834,"size":34}},"numberSize":1}}};
+
+function sharedLayout(key) {
+  return SHARED_LAYOUTS.templates[key] || null;
+}
+
+function localLayoutIsCurrent(key, kind) {
+  return !sharedLayout(key) || localStorage.getItem(storageKey(key, kind + "Revision")) === SHARED_LAYOUTS.revision;
+}
+
+let currentKey = Object.keys(TEMPLATES)[0];
+let values = {};
+let calibrate = false;
+let positions = {};
+let measurementSizeScale = 1;
+
+const templateSelect = document.getElementById("templateSelect");
+const imageUpload = document.getElementById("imageUpload");
+const fieldsDiv = document.getElementById("fields");
+const templateImage = document.getElementById("templateImage");
+const overlayLayer = document.getElementById("overlayLayer");
+const previewWrap = document.getElementById("previewWrap");
+const exportBtn = document.getElementById("exportBtn");
+const clearBtn = document.getElementById("clearBtn");
+const calibrateBtn = document.getElementById("calibrateBtn");
+const savePositionsBtn = document.getElementById("savePositionsBtn");
+const numberSize = document.getElementById("numberSize");
+const numberSizeValue = document.getElementById("numberSizeValue");
+
+function isMeasurementField(field) {
+  return field !== "Item Name" && field !== "Tagged Size";
+}
+
+function fieldFontSize(field, pos) {
+  return pos.size * (isMeasurementField(field) ? measurementSizeSca
+=== SHARED_LAYOUTS @ 2560386 ===
+put", () => {
+  measurementSizeScale = Number(numberSize.value) / 100;
+  numberSizeValue.textContent = numberSize.value + "%";
+  try {
+    localStorage.setItem(storageKey(currentKey, "numberSize"), String(measurementSizeScale));
+    localStorage.setItem(storageKey(currentKey, "numberSizeRevision"), SHARED_LAYOUTS.revision);
+  }
+  catch (error) { /* Size still works when this browser cannot save preferences. */ }
+  renderOverlay();
+});
+
+function initDropdown() {
+  Object.entries(TEMPLATES).sort((a, b) => a[1].label.localeCompare(b[1].label)).forEach(([key, t]) => {
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = t.label;
+    templateSelect.appendChild(opt);
+  });
+}
+
+function storageKey(type, key) {
+  return STORAGE_PREFIX + type + "_" + key + (key === "image" ? "_verified_masters_v1" : (type === "short_sleeve_tshirt" && key === "positions" ? "_measurement_boxes_v2" : ""));
+}
+
+// Restore the image-loading helpers required by the preview and PNG export.
+// Preserve the user's existing master images, guide art, and saved layouts.
+const OFFICIAL_PORKY_YORKIE_LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABOYAAATmCAYAAACF/K4qAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAE5qADAAQAAAABAAAE5gAAAAAaFPOMAABAAElEQVR4Aey92ZIlOY809vXYvP87ykzX0pV0JesWHICDIAgylnMyq/+RojqCWNwdIGM5S2ZV//V//R//2z/
+=== SHARED_LAYOUTS @ 5615987 ===
+hort_sleeve_tshirt" ? teePositions[f] : null) || DEFAULT_POSITIONS[f] || {x:50,y:50,size:28};
+  });
+  return obj;
+}
+
+function savePositions() {
+  localStorage.setItem(storageKey(currentKey, "positions"), JSON.stringify(positions));
+  localStorage.setItem(storageKey(currentKey, "positionsRevision"), SHARED_LAYOUTS.revision);
+  alert("Positions saved on this device for " + TEMPLATES[currentKey].label + ". Use Back Up All Layouts to transfer new adjustments to the shared builder.");
+}
+
+async function render() {
+  values = {};
+  currentKey = templateSelect.value;
+  positions = getPositions(currentKey);
+  loadNumberSize();
+  const requestedKey = currentKey;
+  templateImage.removeAttribute("src");
+  exportBtn.disabled = true;
+  renderFields();
+  renderOverlay();
+  try {
+    const img = await getBrandedTemplateImage(requestedKey);
+    if (currentKey !== requestedKey) return;
+    templateImage.src = img || "";
+    exportBtn.disabled = !img;
+    renderOverlay();
+  } catch (error) {
+    if (currentKey === requestedKey) alert(error.message);
+  }
+}
+
+// Title areas measured from each supplied guide. Positions and font sizes remain user settings.
+const TITLE_LINE_BOUNDS = {"chore_jacket": [37.7, 97], "sweater": [37.7, 97], "cardigan": [37.7, 97], "hooded_jacket": [37.8, 97], "bomber_jacket": [37.8, 97], "short_sleeve_tshirt": [39.8, 97], "long_sleeve_tshirt": [39.0, 97], "crewneck_sweatshirt
