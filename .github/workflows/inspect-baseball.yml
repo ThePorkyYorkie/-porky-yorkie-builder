@@ -1,0 +1,37 @@
+name: Inspect Baseball Jersey Template
+on:
+  push:
+    paths:
+      - '.github/workflows/inspect-baseball.yml'
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract baseball definition
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path("index.html").read_text()
+          hits=[]
+          for marker in ['baseball_jersey','baseball-jersey','function getBrandedTemplateImage','LOGO_AREAS','TEMPLATES =','SHARED_LAYOUTS']:
+            pos=0
+            while True:
+              n=s.find(marker,pos)
+              if n<0: break
+              hits.append((marker,n,s[max(0,n-300):min(len(s),n+1100)]))
+              pos=n+len(marker)
+              if sum(1 for h in hits if h[0]==marker)>=5: break
+          out=['index size '+str(len(s))]
+          for marker,n,excerpt in hits:out.extend(['=== '+marker+' @ '+str(n)+' ===',excerpt[:1400]])
+          Path('baseball-inspection.txt').write_text('\n'.join(out))
+          PY
+      - name: Commit inspection
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add baseball-inspection.txt
+          git commit -m "Inspect baseball template definition before scoped fix"
+          git push
