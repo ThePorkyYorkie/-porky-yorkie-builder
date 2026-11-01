@@ -8,7 +8,7 @@ assert m, 'Missing embedded baseball master'
 base=Image.open(io.BytesIO(base64.b64decode(m.group(1)))).convert('RGB')
 assert base.size==(1248,1248),base.size
 brand=Path('branding.js').read_text()
-b=re.search(r'const OFFICIAL_LOGO_SOURCE\\s*=\\s*["\\']data:image/jpeg;base64,([^"\\']+)',brand)
+b=re.search(r"const OFFICIAL_LOGO_SOURCE\\s*=\\s*\\\"data:image/jpeg;base64,([^\\\"]+)",brand)
 assert b, 'Official approved logo missing'
 logo=Image.open(io.BytesIO(base64.b64decode(b.group(1)))).convert('RGB')
 color=(237,228,215)
