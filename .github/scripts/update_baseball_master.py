@@ -6,7 +6,8 @@ s=p.read_text()
 m=re.search(r'data:image/jpeg;base64,([^"]+)',s)
 assert m, 'Missing embedded baseball master'
 base=Image.open(io.BytesIO(base64.b64decode(m.group(1)))).convert('RGB')
-assert base.size==(1248,1248),base.size
+assert base.width==base.height and base.width>=1200,base.size
+base=base.resize((1248,1248),Image.Resampling.LANCZOS)
 brand=Path('branding.js').read_text()
 b=re.search(r"const OFFICIAL_LOGO_SOURCE\\s*=\\s*\\\"data:image/jpeg;base64,([^\\\"]+)",brand)
 assert b, 'Official approved logo missing'
