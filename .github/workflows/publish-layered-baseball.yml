@@ -1,0 +1,44 @@
+name: Publish Layered Baseball Jersey SVG
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-layered-baseball.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install SVG build dependency
+        run: python3 -m pip install --quiet pillow numpy
+      - name: Generate official vector guide
+        run: |
+          python3 -m py_compile .github/scripts/build_baseball_svg.py
+          python3 .github/scripts/build_baseball_svg.py
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          p=Path('guides/baseball_jersey.svg')
+          t=p.read_text()
+          r=ET.fromstring(t)
+          assert r.attrib['width']=='1248' and r.attrib['height']=='1248'
+          assert '#EDE4D7' in t and 'For best fit' in t
+          assert 'Measure straight across the chest' in t
+          assert 'Measure from the top of the shoulder' in t
+          assert 'Your Team' not in t and '>23<' not in t
+          assert t.count('data-layer="movable"') >= 8
+          assert 'data:image/png;base64,' in t
+          print('Baseball SVG checks passed')
+          PY
+      - name: Commit only Baseball Jersey SVG
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add guides/baseball_jersey.svg
+          if git diff --cached --quiet; then
+            echo 'Already current'
+          else
+            git commit -m "Replace baseball guide with layered vector SVG"
+            git push
+          fi
