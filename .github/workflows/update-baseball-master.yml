@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - '.github/workflows/update-baseball-master.yml'
+      - '.github/scripts/update_baseball_master.py'
 permissions:
   contents: write
 jobs:
