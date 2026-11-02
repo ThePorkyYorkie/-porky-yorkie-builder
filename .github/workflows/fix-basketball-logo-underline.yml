@@ -1,0 +1,41 @@
+name: Remove leftover basketball logo underline
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/fix-basketball-logo-underline.yml']
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pillow numpy
+      - name: Make identical approved logo sector, no seams
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import re,base64,io,numpy as np
+          def img(p):
+            s=Path(p).read_text();m=re.search(r'data:image/(?:png|jpeg);base64,([^"]+)',s)
+            assert m
+            return Image.open(io.BytesIO(base64.b64decode(m.group(1)))).convert('RGB')
+          b=img('guides/baseball_jersey.svg');j=img('guides/basketball_jersey.svg')
+          assert b.size==j.size
+          a=np.asarray(b);t=np.array(j)
+          # Copy the entire leftmost background column through all content
+          # above the garment; avoids the old 270px patch-edge ghost.
+          # No basketball graphic occupies the left 270px of this region.
+          t[:440,:270]=a[:440,:270]
+          assert np.array_equal(t[:440,:270],a[:440,:270])
+          out=Image.fromarray(t);buf=io.BytesIO();out.save(buf,'PNG',optimize=True)
+          Path('guides/basketball_jersey.svg').write_text('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1248 1248" width="1248" height="1248"><image width="1248" height="1248" xlink:href="data:image/png;base64,'+base64.b64encode(buf.getvalue()).decode()+'"/></svg>')
+          print('Verified entire empty area below official logo equal to approved Baseball master')
+          PY
+      - name: Commit single asset
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add guides/basketball_jersey.svg
+          git diff --cached --quiet || (git commit -m "Remove remaining logo underline from Basketball guide" && git push)
