@@ -2,7 +2,7 @@ name: Make small inspection preview
 on:
   push:
     branches: [baseball-restoration-review-20261101]
-    paths: ['.github/workflows/baseball-thumbnail.yml']
+    paths: ['.github/workflows/baseball-thumbnail.yml', 'guides/baseball-review.png']
 permissions:
   contents: write
 jobs:
