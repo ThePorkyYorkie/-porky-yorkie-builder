@@ -17,8 +17,7 @@ b=np.array(basket)
 sections=[
  (0,0,271,335),          # official logo, exact
  (970,0,1248,218),       # upper-right navy brand box
- (270,148,968,217),      # MEASUREMENT GUIDE secondary line
- (275,217,1248,355),     # item name, tagged size, star and fit note
+ (275,217,1248,320),     # master form, strictly above any garment artwork
 ]
 for x0,y0,x1,y1 in sections:
  b[y0:y1,x0:x1,:]=a[y0:y1,x0:x1,:]
