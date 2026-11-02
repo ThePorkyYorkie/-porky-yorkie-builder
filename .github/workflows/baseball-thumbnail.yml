@@ -1,0 +1,29 @@
+name: Make small inspection preview
+on:
+  push:
+    branches: [baseball-restoration-review-20261101]
+    paths: ['.github/workflows/baseball-thumbnail.yml']
+permissions:
+  contents: write
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pillow
+      - run: |
+          python3 - <<'PY'
+          from PIL import Image
+          import base64,io
+          im=Image.open('guides/baseball-review.png').convert('RGB')
+          im.thumbnail((650,650))
+          b=io.BytesIO(); im.save(b,format='JPEG',quality=57,optimize=True)
+          data=base64.b64encode(b.getvalue()).decode('ascii')
+          open('guides/baseball-small-preview.svg','w').write('<svg xmlns="http://www.w3.org/2000/svg" width="650" height="650"><image width="650" height="650" href="data:image/jpeg;base64,'+data+'"/></svg>')
+          print('small preview chars',len(data))
+          PY
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add guides/baseball-small-preview.svg
+          git commit -m "Provide inspection preview for original-based Baseball Jersey" && git push
