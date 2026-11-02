@@ -1,0 +1,48 @@
+name: Audit Baseball Basketball master alignment
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/audit-master-alignment.yml']
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pillow numpy
+      - name: Render side by side and report exact differences
+        run: |
+          python3 - <<'PY'
+          import base64,io,re,json
+          from pathlib import Path
+          from PIL import Image,ImageDraw
+          import numpy as np
+          def load(p):
+            s=Path(p).read_text()
+            m=re.search(r'data:image/(?:png|jpeg);base64,([^"]+)',s)
+            assert m
+            return Image.open(io.BytesIO(base64.b64decode(m.group(1)))).convert('RGB')
+          x=load('guides/baseball_jersey.svg')
+          y=load('guides/basketball_jersey.svg')
+          assert x.size==y.size,(x.size,y.size)
+          a=np.asarray(x);b=np.asarray(y)
+          regions={'logo':[0,0,270,320],'brand_box':[970,0,1248,215],'subtitle':[270,145,970,218],'item_fields':[275,218,1248,350],'footer':[0,1145,1248,1248]}
+          results={}
+          for k,(x0,y0,x1,y1) in regions.items():
+            aa=a[y0:y1,x0:x1].astype(float);bb=b[y0:y1,x0:x1].astype(float)
+            results[k]={'mean_pixel_difference':round(float(np.abs(aa-bb).mean()),3),'exact':bool(np.array_equal(aa,bb))}
+          print(json.dumps({'size':x.size,'regions':results},indent=2))
+          canvas=Image.new('RGB',(1200,650),'white')
+          left=x.copy();left.thumbnail((600,600))
+          right=y.copy();right.thumbnail((600,600))
+          canvas.paste(left,(0,0));canvas.paste(right,(600,0))
+          canvas.save('side_by_side_QA.jpg',quality=82)
+          Path('master-alignment-results.json').write_text(json.dumps({'size':x.size,'regions':results},indent=2))
+          PY
+      - name: Commit QA outputs without changing templates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add side_by_side_QA.jpg master-alignment-results.json
+          git commit -m "Record visual master alignment audit" && git push
