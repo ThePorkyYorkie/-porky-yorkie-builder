@@ -2,7 +2,7 @@ name: Review pixel-identical master header
 on:
   push:
     branches: [uniform-basketball-header-review-20261101]
-    paths: ['.github/workflows/uniform-basketball-review.yml']
+    paths: ['.github/workflows/uniform-basketball-review.yml', '.github/scripts/uniform_basketball.py']
 permissions:
   contents: write
 jobs:
