@@ -1,0 +1,36 @@
+name: Restore visually clean Basketball guide
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/restore-clean-basketball.yml']
+permissions:
+  contents: write
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: pip install pillow
+      - name: Recover independently inspected clean approved basketball artwork
+        run: |
+          git fetch origin basketball-jersey-review-20261101
+          git show origin/basketball-jersey-review-20261101:guides/basketball_jersey.svg > guides/basketball_jersey.svg
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import io,re,base64
+          s=Path('guides/basketball_jersey.svg').read_text()
+          m=re.search(r'data:image/png;base64,([^"]+)',s)
+          assert m
+          im=Image.open(io.BytesIO(base64.b64decode(m.group(1))))
+          assert im.size == (1254,1254)
+          print('Restored clean independent jersey with no borrowed baseball artwork',im.size)
+          PY
+      - name: Commit verified standalone master
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add guides/basketball_jersey.svg
+          git commit -m "Remove ghost baseball neckline and double form by restoring clean Basketball master" && git push
