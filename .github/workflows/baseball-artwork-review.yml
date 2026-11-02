@@ -2,7 +2,7 @@ name: Produce Baseball Jersey artwork review
 on:
   push:
     branches: [baseball-restoration-review-20261101]
-    paths: ['.github/workflows/baseball-artwork-review.yml']
+    paths: ['.github/workflows/baseball-artwork-review.yml', '.github/scripts/baseball_artwork_review.py']
 permissions:
   contents: write
 jobs:
