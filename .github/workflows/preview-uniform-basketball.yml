@@ -1,0 +1,27 @@
+name: Render basketball heading proof
+on:
+  push:
+    branches: [uniform-basketball-header-review-20261101]
+    paths: ['.github/workflows/preview-uniform-basketball.yml']
+permissions:
+  contents: write
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pillow
+      - run: |
+          python3 - <<'PY'
+          from PIL import Image
+          import base64,io
+          im=Image.open('basketball-uniform-review.jpg')
+          im.thumbnail((600,600))
+          b=io.BytesIO();im.save(b,format='JPEG',quality=60)
+          open('basketball-uniform-preview.svg','w').write('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><image width="600" height="600" href="data:image/jpeg;base64,'+base64.b64encode(b.getvalue()).decode()+'"/></svg>')
+          PY
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add basketball-uniform-preview.svg
+          git commit -m "Add visual review preview" && git push
