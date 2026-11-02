@@ -31,8 +31,8 @@ jobs:
           def rgb(x,y): return photo.getpixel((x,y))
           # Official logo and brand badge must still contain complex artwork.
           assert max(rgb(110,70))-min(rgb(110,70))<50
-          assert rgb(1030,50)[2]<100
-          assert rgb(620,1150)[2]<135
+          assert rgb(1000,55)[2]<100
+          assert rgb(330,1140)[2]<135
           assert all(abs(a-b)<20 for a,b in zip(rgb(120,450),(237,228,215)))
           print('SVG and embedded 1254-square final artwork verified')
           s=Path('index.html').read_text()
