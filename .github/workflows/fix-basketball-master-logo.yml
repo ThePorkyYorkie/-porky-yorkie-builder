@@ -1,0 +1,50 @@
+name: Rebuild Basketball Jersey master with seamless original logo
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/fix-basketball-master-logo.yml']
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pillow numpy
+      - name: Construct one clean composite master image
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          from io import BytesIO
+          import re,base64,numpy as np,xml.etree.ElementTree as ET
+          def unpack(path):
+              s=Path(path).read_text()
+              m=re.search(r'data:image/(?:png|jpeg);base64,([^"]+)',s)
+              assert m, path
+              return Image.open(BytesIO(base64.b64decode(m.group(1)))).convert('RGB')
+          basketball=unpack('guides/basketball_jersey.svg')
+          baseball=unpack('guides/baseball_jersey.svg')
+          assert baseball.size[0]>=1248 and basketball.size[0]>=1248,(baseball.size,basketball.size)
+          # Replace the WHOLE upper-left branding sector. This entirely removes
+          # the original logo, including its bottom ribbon and any halo.
+          # This left-hand strip contains no title, form or garment content.
+          x_end=280
+          y_end=350
+          basketball.paste(baseball.crop((0,0,x_end,y_end)),(0,0))
+          assert np.array_equal(np.asarray(basketball)[:y_end,:x_end],np.asarray(baseball)[:y_end,:x_end])
+          buf=BytesIO(); basketball.save(buf,format='PNG',optimize=True)
+          encoded=base64.b64encode(buf.getvalue()).decode()
+          svg='<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1248 1248" width="1248" height="1248"><image width="1248" height="1248" xlink:href="data:image/png;base64,'+encoded+'"/></svg>'
+          ET.fromstring(svg)
+          Path('guides/basketball_jersey.svg').write_text(svg)
+          basketball.thumbnail((700,700))
+          basketball.save('basketball-master-logo-review.jpg',quality=80)
+          print('Single image master verified; official logo pixel-for-pixel match in full left branding sector')
+          PY
+      - name: Commit corrected master only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add guides/basketball_jersey.svg basketball-master-logo-review.jpg
+          git diff --cached --quiet || (git commit -m "Remove old Basketball logo entirely and rebuild single-image master" && git push)
