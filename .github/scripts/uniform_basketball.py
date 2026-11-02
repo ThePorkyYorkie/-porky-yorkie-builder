@@ -16,35 +16,18 @@ b=np.array(ball)
 o=np.array(original)
 # Exact shared top: original approved baseball image is the sole source for
 # everything from the top through the Tagged Size and fit note.
-b[:435,:,:]=a[:435,:,:]
+b[:355,:,:]=a[:355,:,:]
 # Garment-only content comes from the separate Basketball Jersey original.
-# The headline alone changes. Borrow only original dark lettering, not the
-# original basketball background, so the top remains identical.
-# Determine letter foreground from dark navy original title text.
-x0,x1=277,952
-y0,y1=14,147
-src=o[y0:y1,x0:x1,:].astype(float)
-dst=b[y0:y1,x0:x1,:].astype(float)
-# Remove baseball heading text from this rectangle with a locally sampled
-# smooth cream backdrop (only title, never other shared masthead elements).
-for row in range(y0,y1):
- left=a[row,275,:].astype(float)
- right=a[row,952,:].astype(float)
- xs=np.linspace(0,1,x1-x0)[:,None]
- b[row,x0:x1,:]=np.clip(left*(1-xs)+right*xs,0,255).astype(np.uint8)
-# Restore dark letter ink exactly; soft antialias edge from original.
-region=b[y0:y1,x0:x1,:].astype(float)
-v=np.mean(src,axis=2)
-alpha=np.clip((205-v)/135,0,1)
-alpha=np.where((src[:,:,2] < src[:,:,0]+30)&(src[:,:,0]<210),alpha,0)
-alpha=alpha[:,:,None]
-# ink source pixel remains dark and sharp, cream background from master.
-b[y0:y1,x0:x1,:]=np.clip(region*(1-alpha)+src*alpha,0,255).astype(np.uint8)
+# Only the original basketball headline changes, as a single clean text region.
+# The neighboring frame, brand box, note, and form remain approved Baseball master.
+x0,x1=275,947
+y0,y1=12,152
+b[y0:y1,x0:x1,:]=o[y0:y1,x0:x1,:]
 out=Image.fromarray(b)
 # Invariant check: brand box, official logo, and form must be pixel-identical.
-assert np.array_equal(b[:435,:270],a[:435,:270])
-assert np.array_equal(b[:435,970:],a[:435,970:])
-assert np.array_equal(b[220:435,280:960],a[220:435,280:960])
+assert np.array_equal(b[:355,:270],a[:355,:270])
+assert np.array_equal(b[:355,970:],a[:355,970:])
+assert np.array_equal(b[220:355,280:960],a[220:355,280:960])
 buf=BytesIO();out.save(buf,'PNG',optimize=True)
 text='<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1248 1248" width="1248" height="1248"><image width="1248" height="1248" xlink:href="data:image/png;base64,'+base64.b64encode(buf.getvalue()).decode()+'"/></svg>'
 Path('guides/basketball_jersey.svg').write_text(text)
