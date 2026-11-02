@@ -1,14 +1,17 @@
 from PIL import Image
 from io import BytesIO
 from pathlib import Path
-import base64,re,numpy as np
+import base64,re,numpy as np,subprocess
 def load_svg(path):
  s=Path(path).read_text()
  m=re.search(r'data:image/(?:png|jpeg);base64,([^"]+)',s)
  assert m,path
  return Image.open(BytesIO(base64.b64decode(m.group(1)))).convert('RGB')
 base=load_svg('guides/baseball_jersey.svg')
-basket=load_svg('guides/basketball_jersey.svg')
+original_main=subprocess.check_output(['git','show','origin/main:guides/basketball_jersey.svg']).decode()
+m=re.search(r'data:image/(?:png|jpeg);base64,([^\"]+)',original_main)
+assert m
+basket=Image.open(BytesIO(base64.b64decode(m.group(1)))).convert('RGB')
 assert base.size==basket.size
 a=np.array(base)
 b=np.array(basket)
