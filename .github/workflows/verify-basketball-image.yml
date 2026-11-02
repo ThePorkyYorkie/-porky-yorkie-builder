@@ -1,0 +1,39 @@
+name: Verify Basketball image seam in review
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/verify-basketball-image.yml']
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pillow numpy
+      - run: |
+          python3 - <<'PY'
+          from PIL import Image
+          import base64,re,io,numpy as np
+          from pathlib import Path
+          def load(file):
+            s=Path(file).read_text()
+            m=re.search(r'data:image/png;base64,([^"]+)',s)
+            assert m
+            return Image.open(io.BytesIO(base64.b64decode(m.group(1)))).convert('RGB')
+          bb=load('guides/baseball_jersey.svg')
+          ba=load('guides/basketball_jersey.svg')
+          assert np.array_equal(np.asarray(bb)[:350,:280],np.asarray(ba)[:350,:280])
+          # Image is single embedded raster, no extra logo overlay objects.
+          svg=Path('guides/basketball_jersey.svg').read_text()
+          assert svg.count('<image ')==1
+          ba.thumbnail((650,650))
+          out=io.BytesIO();ba.save(out,format='JPEG',quality=66)
+          Path('basketball-master-QA.svg').write_text('<svg xmlns="http://www.w3.org/2000/svg" width="650" height="650"><image width="650" height="650" href="data:image/jpeg;base64,'+base64.b64encode(out.getvalue()).decode()+'"/></svg>')
+          print('Verified exact logo pixels and a single integrated image')
+          PY
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add basketball-master-QA.svg
+          git commit -m "Record Basketball master image visual QA preview" && git push
