@@ -31,17 +31,17 @@ jobs:
           approved=np.asarray(current)
           # Header is kept exact from current; ALL garment and footer from the
           # clean, independently composed approved basketball master.
-          # The 350-row boundary is empty page background above original neckline.
-          output[:350,:,:]=approved[:350,:,:]
-          assert np.array_equal(output[:350],approved[:350])
-          assert np.array_equal(output[350:],np.asarray(clean)[350:])
+          # The 322-row boundary is empty page background above original neckline.
+          output[:322,:,:]=approved[:322,:,:]
+          assert np.array_equal(output[:322],approved[:322])
+          assert np.array_equal(output[322:],np.asarray(clean)[322:])
           image=Image.fromarray(output)
           buf=io.BytesIO();image.save(buf,format='PNG',optimize=True)
           Path('guides/basketball_jersey.svg').write_text('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1248" height="1248" viewBox="0 0 1248 1248"><image width="1248" height="1248" xlink:href="data:image/png;base64,'+base64.b64encode(buf.getvalue()).decode()+'"/></svg>')
           thumb=image.copy();thumb.thumbnail((700,700))
           b=io.BytesIO();thumb.save(b,format='JPEG',quality=80)
           Path('basketball-clean-visual.svg').write_text('<svg xmlns="http://www.w3.org/2000/svg" width="700" height="700"><image width="700" height="700" href="data:image/jpeg;base64,'+base64.b64encode(b.getvalue()).decode()+'"/></svg>')
-          print('Verified: no geometry below row 350 inherited from contaminated composite')
+          print('Verified: no geometry below row 322 inherited from contaminated composite')
           PY
       - name: Save isolated reviewed candidate
         run: |
