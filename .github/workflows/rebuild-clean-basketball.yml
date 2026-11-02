@@ -16,7 +16,8 @@ jobs:
       - name: Recreate from untouched original before integrating official logo
         run: |
           git show origin/backup/pre-layered-baseball-2026-11-01:guides/basketball_jersey.svg > guides/basketball_jersey.svg
-          python3 .github/scripts/build_basketball_approved.py
+          git show origin/basketball-jersey-review-20261101:.github/scripts/build_basketball_approved.py > /tmp/build_basketball_approved.py
+          python3 /tmp/build_basketball_approved.py
           python3 - <<'PY'
           import re,base64,io
           from pathlib import Path
