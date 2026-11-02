@@ -2,7 +2,7 @@ name: Audit Baseball Basketball master alignment
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/audit-master-alignment.yml']
+    paths: ['.github/workflows/audit-master-alignment.yml', 'guides/basketball_jersey.svg']
 permissions:
   contents: write
 jobs:
