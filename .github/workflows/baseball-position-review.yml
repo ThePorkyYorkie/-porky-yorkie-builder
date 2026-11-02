@@ -2,7 +2,7 @@ name: Set reviewed Baseball Jersey value positions
 on:
   push:
     branches: [baseball-restoration-review-20261101]
-    paths: ['.github/workflows/baseball-position-review.yml']
+    paths: ['.github/workflows/baseball-position-review.yml', '.github/scripts/baseball_position_review.py']
 permissions:
   contents: write
 jobs:
