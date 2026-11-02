@@ -1,0 +1,30 @@
+name: Build approved Basketball Jersey preview
+on:
+  push:
+    branches: [basketball-jersey-review-20261101]
+    paths: ['.github/workflows/approved-basketball.yml']
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pillow numpy opencv-python-headless
+      - run: python3 .github/scripts/build_basketball_approved.py
+      - name: Create compact visual inspection SVG
+        run: |
+          python3 - <<'PY'
+          from PIL import Image
+          import base64,io
+          im=Image.open('basketball-review-preview.png')
+          im.thumbnail((650,650))
+          b=io.BytesIO(); im.save(b,format='JPEG',quality=65)
+          open('basketball-preview-small.svg','w').write('<svg xmlns="http://www.w3.org/2000/svg" width="650" height="650"><image width="650" height="650" href="data:image/jpeg;base64,'+base64.b64encode(b.getvalue()).decode()+'"/></svg>')
+          PY
+      - name: Commit on review branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add guides/basketball_jersey.svg basketball-review-preview.png basketball-preview-small.svg
+          git commit -m "Build approved Basketball Jersey review" && git push
