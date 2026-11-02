@@ -1,0 +1,57 @@
+name: Remove basketball logo edge artifact
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/basketball-clean-logo-edge.yml']
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pillow numpy
+      - name: Correct branding from common approved master and verify edge
+        run: |
+          python3 - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          import numpy as np,io,re,base64
+          def read(p):
+            txt=Path(p).read_text()
+            m=re.search(r'data:image/(?:png|jpeg);base64,([^"]+)',txt)
+            assert m
+            return Image.open(io.BytesIO(base64.b64decode(m.group(1)))).convert('RGB')
+          source=read('guides/baseball_jersey.svg')
+          target=read('guides/basketball_jersey.svg')
+          assert source.size == target.size
+          s=np.asarray(source).astype(np.float32)
+          t=np.asarray(target).astype(np.float32).copy()
+          h,w=t.shape[:2]
+          # Use the approved common master in the entire left branding region.
+          # At its right/bottom bounds softly blend to the basketball-specific
+          # page background rather than creating an artificial rectangular seam.
+          yy,xx=np.mgrid[0:440,0:312]
+          ax=np.clip((312-xx)/52.0,0,1)
+          ay=np.clip((440-yy)/110.0,0,1)
+          alpha=(ax*ay)[...,None]
+          alpha[0:280,0:260]=1.0
+          t[:440,:312]=s[:440,:312]*alpha+t[:440,:312]*(1-alpha)
+          out=Image.fromarray(np.clip(t,0,255).astype(np.uint8))
+          # Tests: no hard step at old 350 boundary, exact logo face and ribbon.
+          a=np.asarray(out)
+          assert np.array_equal(a[:280,:260],np.asarray(source)[:280,:260])
+          for y in (348,349,350,351,352):
+            assert float(np.abs(a[y,20:205].astype(float)-a[y-1,20:205].astype(float)).mean())<15
+          b=io.BytesIO();out.save(b,format='PNG',optimize=True)
+          encoded=base64.b64encode(b.getvalue()).decode()
+          Path('guides/basketball_jersey.svg').write_text('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1248" height="1248" viewBox="0 0 1248 1248"><image width="1248" height="1248" xlink:href="data:image/png;base64,'+encoded+'"/></svg>')
+          out.thumbnail((700,700));out.save('basketball-edge-QA.png')
+          print('Logo seam retouched and verified')
+          PY
+      - name: Publish verified corrected master
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add guides/basketball_jersey.svg basketball-edge-QA.png
+          git diff --cached --quiet || (git commit -m "Remove residual basketball logo edge seam" && git push)
