@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - run: pip install pillow numpy opencv-python-headless
       - name: Build corrected original
         run: python3 .github/scripts/baseball_artwork_review.py
