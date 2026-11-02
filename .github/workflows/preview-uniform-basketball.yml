@@ -2,7 +2,7 @@ name: Render basketball heading proof
 on:
   push:
     branches: [uniform-basketball-header-review-20261101]
-    paths: ['.github/workflows/preview-uniform-basketball.yml']
+    paths: ['.github/workflows/preview-uniform-basketball.yml', 'basketball-uniform-review.jpg']
 permissions:
   contents: write
 jobs:
