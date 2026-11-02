@@ -1,0 +1,31 @@
+name: Force verified Basketball Jersey asset refresh
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/refresh-basketball-asset.yml']
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache-bust only Basketball Jersey art in live builder
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text()
+          pattern=r'("basketball_jersey"\s*:\s*\{[^{}]*?"embedded"\s*:\s*")guides/basketball_jersey\.svg(?:\?[^"]*)?(")'
+          s,n=re.subn(pattern,r'\g<1>guides/basketball_jersey.svg?v=clean-master-20261101-2328\g<2>',s)
+          assert n==1, f'Expected one Basketball template, got {n}'
+          p.write_text(s)
+          print('Changed only basketball embedded asset path. Other templates preserved.')
+          PY
+      - name: Commit cache refresh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Refresh verified Basketball Jersey artwork on all devices" && git push
