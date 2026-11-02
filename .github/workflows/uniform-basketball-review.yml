@@ -1,0 +1,21 @@
+name: Review pixel-identical master header
+on:
+  push:
+    branches: [uniform-basketball-header-review-20261101]
+    paths: ['.github/workflows/uniform-basketball-review.yml']
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: pip install pillow numpy
+      - run: python3 .github/scripts/uniform_basketball.py
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add guides/basketball_jersey.svg basketball-uniform-review.jpg
+          git diff --cached --quiet || (git commit -m "Review unified header" && git push)
