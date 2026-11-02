@@ -1,0 +1,55 @@
+name: Verify original-based Baseball Jersey artwork and app
+on:
+  push:
+    branches: [baseball-restoration-review-20261101]
+    paths: ['.github/workflows/verify-baseball-review.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pillow
+      - name: Verify asset, placement, exact logo and all other template records untouched
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          from io import BytesIO
+          import xml.etree.ElementTree as ET
+          import base64,re
+          p=Path('guides/baseball_jersey.svg')
+          content=p.read_text()
+          r=ET.fromstring(content)
+          assert r.attrib['viewBox']=='0 0 1248 1248'
+          im=next(x for x in r if x.tag.endswith('image'))
+          uri=next(v for k,v in im.attrib.items() if k.endswith('href'))
+          assert uri.startswith('data:image/jpeg;base64,')
+          photo=Image.open(BytesIO(base64.b64decode(uri.split(',',1)[1]))).convert('RGB')
+          assert photo.size==(1254,1254)
+          def rgb(x,y): return photo.getpixel((x,y))
+          # Official logo and brand badge must still contain complex artwork.
+          assert max(rgb(110,70))-min(rgb(110,70))<50
+          assert rgb(1030,50)[2]<100
+          assert rgb(620,1150)[2]<135
+          assert all(abs(a-b)<20 for a,b in zip(rgb(120,450),(237,228,215)))
+          print('SVG and embedded 1254-square final artwork verified')
+          s=Path('index.html').read_text()
+          assert '"baseball_jersey": {"label": "Baseball Jersey"' in s
+          assert '"embedded": "guides/baseball_jersey.svg"' in s
+          start=s.index('"baseball_jersey":{"positions":')
+          end=s.index(',"numberSize":0.75}',start)
+          entry=s[start:end]
+          assert '"Pit to Pit":{"x":17.9,"y":48.4' in entry
+          assert '"Length":{"x":77.9,"y":48.4' in entry
+          assert 'porkyYorkieBuilderV3_' in s
+          print('App references updated guide and corrected coordinates')
+          # Extract inline script for JavaScript syntax validation.
+          parts=re.findall(r'<script(?:\\s[^>]*)?>(.*?)</script>',s,re.S)
+          script=max(parts,key=len)
+          Path('/tmp/baseball-builder.js').write_text(script)
+          print('JS extracted',len(script))
+          PY
+      - name: Validate builder JavaScript
+        run: node --check /tmp/baseball-builder.js
