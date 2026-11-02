@@ -17,12 +17,12 @@
       "exact": true
     },
     "item_fields": {
-      "mean_pixel_difference": 0.699,
-      "exact": false
+      "mean_pixel_difference": 0.0,
+      "exact": true
     },
     "footer": {
-      "mean_pixel_difference": 83.317,
-      "exact": false
+      "mean_pixel_difference": 0.0,
+      "exact": true
     }
   }
 }
