@@ -1,0 +1,28 @@
+{
+  "size": [
+    1254,
+    1254
+  ],
+  "regions": {
+    "logo": {
+      "mean_pixel_difference": 0.0,
+      "exact": true
+    },
+    "brand_box": {
+      "mean_pixel_difference": 0.0,
+      "exact": true
+    },
+    "subtitle": {
+      "mean_pixel_difference": 0.0,
+      "exact": true
+    },
+    "item_fields": {
+      "mean_pixel_difference": 0.699,
+      "exact": false
+    },
+    "footer": {
+      "mean_pixel_difference": 83.317,
+      "exact": false
+    }
+  }
+}
