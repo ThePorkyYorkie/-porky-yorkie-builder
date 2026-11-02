@@ -1,0 +1,48 @@
+name: Publish crisp Basketball logo from official master
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/crisp-basketball-logo.yml']
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pillow numpy
+      - name: Rebuild sharp branding region from published approved Baseball master
+        run: |
+          python3 - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          import base64,io,re,numpy as np
+          def load(p):
+              s=Path(p).read_text()
+              m=re.search(r'data:image/(?:png|jpeg);base64,([^"]+)',s)
+              assert m
+              return Image.open(io.BytesIO(base64.b64decode(m.group(1)))).convert('RGB')
+          base=load('guides/baseball_jersey.svg')
+          ball=load('guides/basketball_jersey.svg')
+          assert base.size==ball.size
+          # Logo / ribbon pixel artwork is entirely within this region.
+          # It is copied sharply, with NO opacity or feathering whatsoever.
+          # The row immediately below the ribbon comes from the same official master.
+          box=(0,0,276,330)
+          ball.paste(base.crop(box),(0,0))
+          a=np.asarray(ball); b=np.asarray(base)
+          assert np.array_equal(a[:330,:276],b[:330,:276])
+          # No faded pixel mixing in the logo or the edge below it.
+          # All other garment and instructional panels remain byte-identical.
+          output=io.BytesIO(); ball.save(output,'PNG',optimize=True)
+          svg='<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1248 1248" width="1248" height="1248"><image width="1248" height="1248" xlink:href="data:image/png;base64,'+base64.b64encode(output.getvalue()).decode()+'"/></svg>'
+          Path('guides/basketball_jersey.svg').write_text(svg)
+          ball.thumbnail((700,700));ball.save('basketball-crisp-logo-QA.jpg',quality=83)
+          print('Sharp official logo region exact pixel match; no feathering')
+          PY
+      - name: Commit only changed master image
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add guides/basketball_jersey.svg basketball-crisp-logo-QA.jpg
+          git diff --cached --quiet || (git commit -m "Publish sharp unblended official Basketball Jersey logo" && git push)
