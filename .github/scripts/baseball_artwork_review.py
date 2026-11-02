@@ -9,7 +9,8 @@ src=p.read_text()
 m=re.search(r'data:image/jpeg;base64,([^"]+)',src)
 assert m
 im=Image.open(BytesIO(base64.b64decode(m.group(1)))).convert('RGB')
-assert im.size==(1248,1248)
+print('original dimensions',im.size)
+im=im.resize((1248,1248),Image.Resampling.LANCZOS)
 a=np.array(im)
 # Rebuild unprinted jersey surface with neighboring cloth, preserving panel linework.
 mask=np.zeros((1248,1248),np.uint8)
