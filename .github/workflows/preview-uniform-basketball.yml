@@ -17,7 +17,7 @@ jobs:
           import base64,io
           im=Image.open('basketball-uniform-review.jpg')
           im.thumbnail((600,600))
-          b=io.BytesIO();im.save(b,format='JPEG',quality=68)
+          b=io.BytesIO();im.save(b,format='JPEG',quality=69)
           open('basketball-uniform-preview.svg','w').write('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><image width="600" height="600" href="data:image/jpeg;base64,'+base64.b64encode(b.getvalue()).decode()+'"/></svg>')
           PY
       - run: |
