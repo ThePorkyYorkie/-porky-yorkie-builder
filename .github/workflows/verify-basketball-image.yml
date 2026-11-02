@@ -18,7 +18,7 @@ jobs:
           from pathlib import Path
           def load(file):
             s=Path(file).read_text()
-            m=re.search(r'data:image/png;base64,([^"]+)',s)
+            m=re.search(r'data:image/(?:png|jpeg);base64,([^"]+)',s)
             assert m
             return Image.open(io.BytesIO(base64.b64decode(m.group(1)))).convert('RGB')
           bb=load('guides/baseball_jersey.svg')
