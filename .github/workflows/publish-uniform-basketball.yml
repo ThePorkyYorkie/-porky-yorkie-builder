@@ -1,0 +1,42 @@
+name: Publish QA-approved uniform Basketball header
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-uniform-basketball.yml']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: pip install pillow numpy
+      - name: Read approved review artifact and enforce common-header geometry
+        run: |
+          git fetch origin uniform-basketball-header-review-20261101
+          git show origin/uniform-basketball-header-review-20261101:guides/basketball_jersey.svg > guides/basketball_jersey.svg
+          python3 - <<'PY'
+          import numpy as np,re,base64,io
+          from pathlib import Path
+          from PIL import Image
+          def read(path):
+            s=Path(path).read_text()
+            m=re.search(r'data:image/(?:png|jpeg);base64,([^"]+)',s)
+            assert m
+            return np.asarray(Image.open(io.BytesIO(base64.b64decode(m.group(1)))).convert('RGB'))
+          a=read('guides/baseball_jersey.svg')
+          b=read('guides/basketball_jersey.svg')
+          assert a.shape==b.shape
+          assert np.array_equal(a[145:320,:,:],b[145:320,:,:]),'Shared header must be pixel identical'
+          assert np.array_equal(a[:145,:270,:],b[:145,:270,:]),'Logo must match'
+          assert np.array_equal(a[:145,970:,:],b[:145,970:,:]),'Brand box must match'
+          print('Verified exact shared header and unaffected full-resolution image')
+          PY
+      - name: Commit only the approved Basketball guide
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add guides/basketball_jersey.svg
+          git diff --cached --quiet || (git commit -m "Align Basketball header to approved shared Baseball master" && git push)
