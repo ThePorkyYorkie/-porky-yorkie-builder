@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - run: pip install pillow numpy
+      - run: pip install pillow numpy opencv-python-headless
       - run: python3 .github/scripts/uniform_basketball.py
       - run: |
           git config user.name "github-actions[bot]"
