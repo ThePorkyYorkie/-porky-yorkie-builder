@@ -30,7 +30,7 @@
 <div class="split"><div><label>Move horizontally (%)</label><input id="offsetX" type="range" min="-60" max="60" step="1" value="0"></div><div><label>Move vertically (%)</label><input id="offsetY" type="range" min="-60" max="60" step="1" value="0"></div><div><label>Zoom (%)</label><input id="zoom" type="range" min="50" max="200" step="1" value="100"></div></div>
 </section>
 <section class="panel" id="logoPanel"><h2>5 · Official logo & watermark</h2>
-<label>Upload an official logo PNG (transparent preferred)</label><input id="logoFile" type="file" accept="image/*">
+<div class="status" id="logoStatus">No official logo loaded. Upload your logo once; it will be remembered in this browser.</div><label>Choose your official Porky Yorkie logo (PNG with transparency preferred)</label><input id="logoFile" type="file" accept="image/*"><div class="row"><button id="forgetLogo" type="button">Forget saved logo</button></div>
 <div class="split">
 <div><label>Logo style</label><select id="logoStyle"><option value="cream">Cream badge</option><option value="white">White on transparent</option><option value="black">Black on transparent</option><option value="none">None</option></select></div>
 <div><label>Starting corner</label><select id="corner"><option value="br">Bottom right</option><option value="bl">Bottom left</option><option value="tr">Top right</option><option value="tl">Top left</option><option value="center">Center</option></select></div>
@@ -92,7 +92,16 @@ $('copyCrop').onclick=()=>{const c=chosen();if(!c)return;const cr={...cropFor(c)
 $('ratio').onchange=e=>{S.ratio=e.target.value;sizeCanvas();controls();render()};
 $('corner').onchange=e=>{S.corner=e.target.value;S.corners[S.ratio]=cornerXY(S.corner);render()};
 $('resetLogo').onclick=()=>{S.corners[S.ratio]=cornerXY(S.corner);render()};
-$('logoFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{S.logo=im;render()};im.src=URL.createObjectURL(f)};
+const logoStatus=$('logoStatus');
+function setLogoStatus(message){logoStatus.textContent=message}
+function openLogoDB(){return new Promise((resolve,reject)=>{if(!window.indexedDB)return reject(Error('Storage unavailable'));const request=indexedDB.open('PorkyYorkieReelEditor',1);request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains('settings'))request.result.createObjectStore('settings')};request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error)})}
+async function storeLogo(blob){const db=await openLogoDB();return new Promise((resolve,reject)=>{const tx=db.transaction('settings','readwrite');tx.objectStore('settings').put(blob,'officialLogo');tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)}})}
+async function getStoredLogo(){const db=await openLogoDB();return new Promise((resolve,reject)=>{const tx=db.transaction('settings','readonly'),request=tx.objectStore('settings').get('officialLogo');request.onsuccess=()=>{db.close();resolve(request.result)};request.onerror=()=>{db.close();reject(request.error)}})}
+async function removeStoredLogo(){const db=await openLogoDB();return new Promise((resolve,reject)=>{const tx=db.transaction('settings','readwrite');tx.objectStore('settings').delete('officialLogo');tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();reject(tx.error)}})}
+function displayLogo(blob){return new Promise((resolve,reject)=>{const url=URL.createObjectURL(blob),im=new Image();im.onload=()=>{S.logo=im;setLogoStatus('Official logo loaded ✓  Drag it inside the preview to position it.');render();resolve()};im.onerror=()=>{URL.revokeObjectURL(url);reject(Error('Could not read logo image'))};im.src=url})}
+$('logoFile').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{await displayLogo(file);try{await storeLogo(file);setLogoStatus('Official logo saved on this device ✓  It will load automatically next time.')}catch(err){setLogoStatus('Logo loaded for this session; browser did not allow permanent storage.')}}catch(err){setLogoStatus('Unable to read that image. Try a PNG logo.')}};
+$('forgetLogo').onclick=async()=>{S.logo=null;try{await removeStoredLogo()}catch(e){}setLogoStatus('Saved logo cleared. Choose your official logo to add it again.');render()};
+(async()=>{try{const saved=await getStoredLogo();if(saved){await displayLogo(saved);setLogoStatus('Saved official logo loaded automatically ✓')}else setLogoStatus('No official logo loaded. Choose your logo once and this browser will remember it.')}catch(e){setLogoStatus('Choose your logo image. Saving between sessions may not be available in this browser.')}})();
 for(const id of ['logoSize','logoOpacity','logoStyle'])$(id).oninput=e=>{S[id]=id==='logoStyle'?e.target.value:Number(e.target.value);render()};
 let dragging=false;stage.addEventListener('pointerdown',e=>{if(S.cropMode||!S.logo)return;dragging=true;stage.setPointerCapture(e.pointerId);moveLogo(e)});stage.addEventListener('pointermove',e=>{if(dragging)moveLogo(e)});stage.addEventListener('pointerup',()=>dragging=false);
 function moveLogo(e){const rect=stage.getBoundingClientRect();S.corners[S.ratio]=[clamp((e.clientX-rect.left)/rect.width,.04,.96),clamp((e.clientY-rect.top)/rect.height,.04,.96)];render()}
